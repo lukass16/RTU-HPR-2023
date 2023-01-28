@@ -1,24 +1,29 @@
 #include <Arduino.h>
-#include "motor.h"
+#include "motor_wrapper.h"
+#include "imu_wrapper.h"
+#include "server_wrapper.h"
 
 void setup()
 {
 	Serial.begin(115200);
 	Serial.println("Starting Reaction Wheel Test");
 	motor::setup();
-	
+
+	imu::setup();
+
+	// Starting motor movement
 	motor::setDirection(1);
 	motor::setDutyCycle(30);
+
+	// Starting server
+	server::setup();
 }
 
 void loop()
 {
-	//Serial.println("A: " + String(analogRead(A)));
-	// if (duty <= 255)
-	// {
-	// 	pwm::setDutyCycle(duty);
-	// 	Serial.println("Duty cycle set to: " + String(duty) + "/255");
-	// }
-	// delay(2000);
-	// duty += 10;
+	imu::readSensor();
+	delay(1000);
+	Serial.println(imu::getGyrX());
+	server::handleClient();
+	server::setData();
 }
