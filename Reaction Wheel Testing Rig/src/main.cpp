@@ -2,42 +2,39 @@
 #include "motor_wrapper.h"
 #include "imu_wrapper.h"
 #include "server_wrapper.h"
-int i = 1;
+#include "pid_wrapper.h"
+
+float dWheelSpeed = 0, platSpeed = 0, wheelSpeed = 0, wheelSpeedPrev = 0;
+
+PIDController controler;
 
 void setup()
 {
 	Serial.begin(115200);
 	Serial.println("Starting Reaction Wheel Test");
+
+	controler.Kp = 0.1;
+	controler.Ki = 0.1;
+	controler.Kd = 0.1;
+	controler.tau = 0.95;
+	controler.T = 0.02; // sample time in sec
+	controler.limMax = 0.95;
+	controler.limMin = -0.95;
+
+	pidcontrol::setup(controler);
+
 	motor::setup();
-
 	imu::setup();
-
-	// Starting motor movement
-	motor::setDirection(1);
-	motor::setDutyCycle(150);
-
-	// Starting server
-	// server::setup();
 }
 
 void loop()
 {
-	// delay(500);
-	// imu::readSensor();
-	// if (i)
-	// {
-	// 	motor::setDirection(0);
-	// 	i = 0;
-	// }
-	// else
-	// {
-	// 	motor::setDirection(1);
-	// 	i = 1;
-	// }
+	imu::readSensor();
+	platSpeed = imu::getGyrZ();
+	dWheelSpeed = pidcontrol::update(controler, 0, platSpeed);
+	wheelSpeed = pidcontrol::increment(wheelSpeed, dWheelSpeed);
 
-	Serial.println("X: " + String(imu::getGyrX()));
-	Serial.println("Y: " + String(imu::getGyrY()));
-	Serial.println("Z: " + String(imu::getGyrZ()));
-	// server::handleClient();
-	// server::setData();
+	motor::stabilize(wheelSpeed);
+
+	delay(20);
 }

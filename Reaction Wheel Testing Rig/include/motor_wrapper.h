@@ -9,11 +9,14 @@
 
 // https://randomnerdtutorials.com/esp32-pwm-arduino-ide/
 
+//! TESTING
+int dutyCycle = 0, direction = 0;
+
 namespace motor
 {
     // declaring initial values for PWM channel attributes
     int freq = 4000, channel = 0, resolution = 8;
-    
+
     void setup()
     {
         // setting pins
@@ -22,7 +25,7 @@ namespace motor
         pinMode(B_PIN, INPUT);
 
         ledcSetup(channel, freq, resolution); // setting up the PWM channel
-        ledcAttachPin(PWM_PIN, channel);    // attaching the piezo_pin to the PWM channel
+        ledcAttachPin(PWM_PIN, channel);      // attaching the piezo_pin to the PWM channel
         Serial.println("Motor setup finished. PWM pin: " + String(PWM_PIN) + ", direction pin: " + String(DIRECTION_PIN));
     }
 
@@ -43,7 +46,7 @@ namespace motor
 
     void setDirection(int direction)
     {
-        digitalWrite(DIRECTION_PIN, direction); // HIGH or LOW 
+        digitalWrite(DIRECTION_PIN, direction); // HIGH or LOW
     }
 
     int readChannelA()
@@ -54,5 +57,33 @@ namespace motor
     int readChannelB()
     {
         return analogRead(B_PIN);
+    }
+
+    void stabilize(float wheelSpeed)
+    {
+        static float wheelSpeedPrev = wheelSpeed;
+        
+        // convert to duty cycle and motor direction output
+        if (wheelSpeed != wheelSpeedPrev)
+        {
+            if (wheelSpeed >= 0)
+            {
+                dutyCycle = round(wheelSpeed * 255);
+                direction = 1;
+            }
+            else
+            {
+                dutyCycle = -round(wheelSpeed * 255);
+                direction = 0;
+            }
+        }
+
+        Serial.println(String(dutyCycle) + "\t" +  String(direction));
+        
+        // sending stabilizing commands to motor
+        motor::setDutyCycle(dutyCycle);
+        motor::setDirection(direction);
+
+        wheelSpeedPrev = wheelSpeed;
     }
 }
