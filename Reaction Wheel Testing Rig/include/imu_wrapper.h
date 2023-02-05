@@ -100,4 +100,14 @@ namespace imu
         return gyr_x;
     }
 
+    float getGyrY()
+    {
+        return gyr_y;
+    }
+
+    float getGyrZ()
+    {
+        return gyr_z;
+    }
+
 }

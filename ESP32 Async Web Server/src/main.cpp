@@ -7,11 +7,20 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/elements
 
+struct GainStruct
+{
+	float P;
+	float I;
+	float D;
+};
+
+GainStruct gains;
+
 String outputState(int output);
 
 // Replace with your network credentials
-const char *ssid = "Tele2-8c311";
-const char *password = "8g6ihj47rb2";
+const char *ssid = "ESP32-Access-Point";
+const char *password = "VIP-2022";
 
 const char *PARAM_INPUT_1 = "P";
 const char *PARAM_INPUT_2 = "I";
@@ -45,7 +54,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <script>function handleSubmit(element) {
   inputs = element.elements;
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", "/update?P="+inputs["P"].value+"&I="+inputs["I"].value+"&D="+inputs["D"].value, true)
+  xhr.open("GET", "/update?P="+inputs["P"].value+"&I="+inputs["I"].value+"&D="+inputs["D"].value+"/", true)
   xhr.send();
 }
 </script>
@@ -61,10 +70,10 @@ String processor(const String &var)
 	{
 		String form = "";
 		form += "<form onsubmit=\"handleSubmit(this)\">";
-		form += "<h4>P - Gain</h4><input type=\"text\" name=\"P\">";
-		form += "<h4>I - Gain</h4><input type=\"text\" name=\"I\">";
-		form += "<h4>D - Gain</h4><input type=\"text\" name=\"D\">";
-		form += "<input type=\"submit\"></form>";
+		form += "<h4>P - Gain</h4><input type=\"text\" name=\"P\" value=\"" + String(gains.P) + "\">";
+		form += "<h4>I - Gain</h4><input type=\"text\" name=\"I\" value=\"" + String(gains.I) + "\">";
+		form += "<h4>D - Gain</h4><input type=\"text\" name=\"D\" value=\"" + String(gains.D) + "\">";
+		form += "<br><input type=\"submit\"></form>";
 		return form;
 	}
 	return String();
@@ -75,16 +84,14 @@ void setup()
 	// Serial port for debugging purposes
 	Serial.begin(115200);
 
-	// Connect to Wi-Fi
-	WiFi.begin(ssid, password);
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(1000);
-		Serial.println("Connecting to WiFi..");
-	}
+	// Set access point
+	Serial.print("Setting AP (Access Point)...");
+	WiFi.softAP(ssid, password);
 
-	// Print ESP Local IP Address
-	Serial.println(WiFi.localIP());
+	// Print IP address
+	IPAddress IP = WiFi.softAPIP();
+	Serial.print("AP IP address: ");
+	Serial.println(IP);
 
 	// Route for root / web page
 	server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -100,10 +107,10 @@ void setup()
     if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2) && request->hasParam(PARAM_INPUT_3)) {
       P = request->getParam(PARAM_INPUT_1)->value();
       I = request->getParam(PARAM_INPUT_2)->value();
-	  D = request->getParam(PARAM_INPUT_2)->value();
-	  Serial.println(P);
-	  Serial.println(I);
-	  Serial.println(D);
+	  D = request->getParam(PARAM_INPUT_3)->value();
+	  gains.P = P.toFloat();
+	  gains.I = I.toFloat();
+	  gains.D = D.toFloat();
     }
     else {
       Serial.println("No data received");
