@@ -24,7 +24,7 @@ struct PIDController
 
 namespace pidcontrol
 {
-	void setup(PIDController pid)
+	void setup(PIDController &pid)
 	{
 		pid.integrator = 0.0f;
 		pid.prevError = 0.0f;
@@ -35,7 +35,7 @@ namespace pidcontrol
 		pid.out = 0.0f;
 	}
 
-	float update(PIDController pid, float setpoint, float measurement)
+	float update(PIDController &pid, float setpoint, float measurement)
 	{
 
 		float error = setpoint - measurement;

@@ -69,12 +69,12 @@ namespace motor
             if (wheelSpeed >= 0)
             {
                 dutyCycle = round(wheelSpeed * 255);
-                direction = 1;
+                direction = 0;
             }
             else
             {
                 dutyCycle = -round(wheelSpeed * 255);
-                direction = 0;
+                direction = 1;
             }
         }
 
