@@ -29,6 +29,9 @@ void setup()
 
 void loop()
 {
+	// set PID gains
+
+
 	imu::readSensor();
 	platSpeed = imu::getGyrZ();
 	dWheelSpeed = pidcontrol::update(controler, 0, platSpeed);
