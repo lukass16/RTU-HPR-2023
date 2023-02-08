@@ -41,8 +41,7 @@ void loop()
 
 	imu::readSensor();
 	platSpeed = imu::getGyrZ();
-	dWheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
-	wheelSpeed = pidcontrol::increment(wheelSpeed, dWheelSpeed);
+	wheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
 
 	motor::stabilize(wheelSpeed);
 

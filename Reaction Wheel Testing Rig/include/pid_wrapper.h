@@ -94,21 +94,10 @@ namespace pidcontrol
 		pid->prevError = error;
 		pid->prevMeasurement = measurement;
 
-		Serial.println("Err: " + String(error));
+		//Serial.println("Err: " + String(error));
+		Serial.println("P:"+String(proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
 
 		return pid->out;
 	}
 
-	float increment(float wheelSpeed, float dWheelSpeed)
-	{
-		if (dWheelSpeed > 0 && wheelSpeed + dWheelSpeed < 1.0)
-		{
-			wheelSpeed += dWheelSpeed;
-		}
-		else if (dWheelSpeed < 0 && wheelSpeed + dWheelSpeed > -1.0)
-		{
-			wheelSpeed += dWheelSpeed;
-		}
-		return wheelSpeed;
-	}
 };
