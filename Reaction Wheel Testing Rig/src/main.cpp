@@ -17,15 +17,15 @@ void setup()
 	motor::setup();
 	imu::setup();
 
-	controler.Kp = 0.2;
+	controler.Kp = 0.8;
 	controler.Ki = 0.2;
 	controler.Kd = 0.2;
 	controler.tau = 0.90;
-	controler.T = 0.02; // sample time in sec
+	controler.T = 0.05; // sample time in sec
 	controler.limMax = 0.95;
 	controler.limMin = -0.95;
 
-	pidcontrol::setup(controler);
+	pidcontrol::setup(&controler);
 }
 
 void loop()
@@ -41,10 +41,10 @@ void loop()
 
 	imu::readSensor();
 	platSpeed = imu::getGyrZ();
-	dWheelSpeed = pidcontrol::update(controler, 0, platSpeed);
+	dWheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
 	wheelSpeed = pidcontrol::increment(wheelSpeed, dWheelSpeed);
 
 	motor::stabilize(wheelSpeed);
 
-	delay(20);
+	delay(50);
 }
