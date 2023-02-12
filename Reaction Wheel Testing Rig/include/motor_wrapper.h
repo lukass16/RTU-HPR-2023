@@ -5,12 +5,19 @@
 #define PWM_PIN 32
 #define DIRECTION_PIN 33
 #define A_PIN 36
-#define B_PIN 36
+#define B_PIN 37
 
 // https://randomnerdtutorials.com/esp32-pwm-arduino-ide/
+// https://lastminuteengineers.com/handling-esp32-gpio-interrupts-tutorial/
 
 //! TESTING
 int dutyCycle = 0, direction = 0;
+volatile int testCounter = 0;
+
+void IRAM_ATTR encoder()
+{
+    testCounter++;
+}
 
 namespace motor
 {
@@ -21,12 +28,22 @@ namespace motor
     {
         // setting pins
         pinMode(DIRECTION_PIN, OUTPUT);
-        pinMode(A_PIN, INPUT);
-        pinMode(B_PIN, INPUT);
+        pinMode(A_PIN, INPUT_PULLDOWN);
+        pinMode(B_PIN, INPUT_PULLDOWN);
 
         ledcSetup(channel, freq, resolution); // setting up the PWM channel
         ledcAttachPin(PWM_PIN, channel);      // attaching the piezo_pin to the PWM channel
         Serial.println("Motor setup finished. PWM pin: " + String(PWM_PIN) + ", direction pin: " + String(DIRECTION_PIN));
+    }
+
+    void setupEncoder()
+    {
+        attachInterrupt(A_PIN, encoder, RISING);
+    }
+
+    void testEncoder()
+    {
+        Serial.println(testCounter);
     }
 
     void setDutyCycle(int duty_cycle) // 0 - 255
@@ -87,3 +104,6 @@ namespace motor
         wheelSpeedPrev = wheelSpeed;
     }
 }
+
+
+

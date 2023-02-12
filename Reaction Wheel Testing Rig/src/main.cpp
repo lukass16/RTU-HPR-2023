@@ -15,6 +15,7 @@ void setup()
 
 	asyncserver::setup();
 	motor::setup();
+	motor::setupEncoder();
 	imu::setup();
 
 	controler.Kp = 0.8;
