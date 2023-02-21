@@ -14,7 +14,7 @@
 #define _SD_CS 25
 
 unsigned long SD_time = millis();
-char filename[50] = "init.csv";
+char filename[50] = "piddata.csv";
 
 namespace sdcard
 {
@@ -84,15 +84,15 @@ namespace sdcard
 			return 0;
 		}
 
-		fileSD.println("Time [ms],Plat Ang Vel [rad/s],Wheel Speed [%],P,I,D");
+		fileSD.println("Time [ms],Plat Ang Vel [rad/s],Wheel Speed [%],KP,KI,KD,P,I,D");
 		return 1;
 	}
 
-	void writeData(SD_File fileSD, float plat_vel, float wheel_spd, float P, float I, float D)
+	void writeData(SD_File fileSD, float plat_vel, float wheel_spd, float Kp, float Ki, float Kd, float P, float I, float D)
 	{
 		if (fileSD)
 		{
-			fileSD.println(String(getTimeElapsed(), 4) + "," + String(wheel_spd, 4) + "," + String(plat_vel, 4) + "," + String(P, 4) + "," + String(I, 4) + "," + String(D, 4));
+			fileSD.println(String(getTimeElapsed(), 4) + "," + String(wheel_spd, 4) + "," + String(plat_vel, 4) + "," + String(Kp, 4) + "," + String(Ki, 4) + "," + String(Kd, 4) + "," + String(P, 4) + "," + String(I, 4) + "," + String(D, 4));
 		}
 
 		// automatically closes and reopens file every n readings to avoid lost data

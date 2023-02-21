@@ -33,6 +33,7 @@ void setup()
 	pidcontrol::setup(&controler);
 
 	fileSD = sdcard::openFile();
+	sdcard::writeHeader(fileSD);
 }
 
 void loop()
@@ -44,12 +45,6 @@ void loop()
 		controler.Ki = asyncserver::getI();
 		controler.Kd = asyncserver::getD();
 		asyncserver::printGains();
-
-		// open new file
-		fileSD.close();
-		sdcard::setFilename(controler.Kp, controler.Ki, controler.Kd);
-		fileSD = sdcard::openFile();
-		sdcard::writeHeader(fileSD);
 	}
 
 	imu::readSensor();
@@ -59,7 +54,7 @@ void loop()
 	motor::stabilize(wheelSpeed);
 
 	// save cycle to SD card
-	sdcard::writeData(fileSD, platSpeed, wheelSpeed, controler.proportional, controler.integrator, controler.differentiator);
+	sdcard::writeData(fileSD, platSpeed, wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
 
 	delay(50);
 	
