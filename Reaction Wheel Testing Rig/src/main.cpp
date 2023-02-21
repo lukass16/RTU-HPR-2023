@@ -2,11 +2,14 @@
 #include "motor_wrapper.h"
 #include "imu_wrapper.h"
 #include "asyncserver_wrapper.h"
+#include "sdcard_wrapper.h"
 #include "pid_wrapper.h"
 
-float dWheelSpeed = 0, platSpeed = 0, wheelSpeed = 0, wheelSpeedPrev = 0;
+float platSpeed = 0, wheelSpeed = 0;
 
 PIDController controler;
+
+SD_File fileSD;
 
 void setup()
 {
@@ -14,6 +17,7 @@ void setup()
 	Serial.println("Starting Reaction Wheel Test");
 
 	asyncserver::setup();
+	sdcard::setup();
 	motor::setup();
 	motor::setupEncoder();
 	imu::setup();
@@ -27,6 +31,8 @@ void setup()
 	controler.limMin = -0.95;
 
 	pidcontrol::setup(&controler);
+
+	fileSD = sdcard::openFile();
 }
 
 void loop()
@@ -38,6 +44,12 @@ void loop()
 		controler.Ki = asyncserver::getI();
 		controler.Kd = asyncserver::getD();
 		asyncserver::printGains();
+
+		// open new file
+		fileSD.close();
+		sdcard::setFilename(controler.Kp, controler.Ki, controler.Kd);
+		fileSD = sdcard::openFile();
+		sdcard::writeHeader(fileSD);
 	}
 
 	imu::readSensor();
@@ -46,5 +58,9 @@ void loop()
 
 	motor::stabilize(wheelSpeed);
 
+	// save cycle to SD card
+	sdcard::writeData(fileSD, platSpeed, wheelSpeed, controler.proportional, controler.integrator, controler.differentiator);
+
 	delay(50);
+	
 }

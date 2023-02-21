@@ -14,6 +14,7 @@ struct PIDController
 
 	float T; // sample time in sec
 
+    float proportional;
 	float integrator;
 	float prevError;
 	float differentiator;
@@ -26,6 +27,7 @@ namespace pidcontrol
 {
 	void setup(PIDController* pid)
 	{
+		pid->proportional = 0.0f;
 		pid->integrator = 0.0f;
 		pid->prevError = 0.0f;
 
@@ -40,7 +42,7 @@ namespace pidcontrol
 		float error = setpoint - measurement;
 
 		//* Proportional component calculations
-		float proportional = pid->Kp * error;
+		pid->proportional = pid->Kp * error;
 
 		//* Integral component calculations
 		pid->integrator = pid->integrator + 0.5f * pid->Ki * pid->T * (error + pid->prevError);
@@ -48,18 +50,18 @@ namespace pidcontrol
 		//* Integral clamping logic
 		float limMinInt, limMaxInt;
 
-		if (pid->limMax > proportional)
+		if (pid->limMax > pid->proportional)
 		{
-			limMaxInt = pid->limMax - proportional;
+			limMaxInt = pid->limMax - pid->proportional;
 		}
 		else
 		{
 			limMaxInt = 0.0f;
 		}
 
-		if (pid->limMin < proportional)
+		if (pid->limMin < pid->proportional)
 		{
-			limMinInt = pid->limMin - proportional;
+			limMinInt = pid->limMin - pid->proportional;
 		}
 		else
 		{
@@ -79,7 +81,7 @@ namespace pidcontrol
 		pid->differentiator = (2.0f * pid->Kd * (measurement - pid->prevMeasurement) + (2.0f * pid->tau - pid->T) * pid->differentiator) / (2.0f * pid->tau + pid->T);
 
 		//* Total output calculations
-		pid->out = proportional + pid->integrator + pid->differentiator;
+		pid->out = pid->proportional + pid->integrator + pid->differentiator;
 
 		//* Output clamping
 		if (pid->out > pid->limMax)
@@ -95,7 +97,7 @@ namespace pidcontrol
 		pid->prevMeasurement = measurement;
 
 		//Serial.println("Err: " + String(error));
-		Serial.println("P:"+String(proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
+		Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
 
 		return pid->out;
 	}
