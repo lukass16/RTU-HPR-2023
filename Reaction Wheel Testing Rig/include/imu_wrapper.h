@@ -13,18 +13,18 @@
 // - VECTOR_GRAVITY       - m/s^2
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
-sensors_event_t angVelocityData, accelerometerData;
-sensors_event_t *gyrEvent, *accEvent;
+sensors_event_t angVelocityData, accelerometerData, orientationData;
+sensors_event_t *gyrEvent, *accEvent, *orEvent;
 
 namespace imu
 {
-    float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, tmp;
+    float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, or_x, or_y, or_z, tmp;
 
     void setup()
     {
         Serial.println("Initializing BNO055");
         /* Initialise the sensor */
-        if (!bno.begin(OPERATION_MODE_ACCGYRO))
+        if (!bno.begin(OPERATION_MODE_NDOF))
         {
             /* There was a problem detecting the BNO055 ... check your connections */
             Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
@@ -36,14 +36,19 @@ namespace imu
     {
         bno.getEvent(&accelerometerData, Adafruit_BNO055::VECTOR_ACCELEROMETER);
         bno.getEvent(&angVelocityData, Adafruit_BNO055::VECTOR_GYROSCOPE);
+        bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
         accEvent = &accelerometerData;
         gyrEvent = &angVelocityData;
+        orEvent = &orientationData;
         acc_x = accEvent->acceleration.x / 9.807; //converting to [g]
         acc_y = accEvent->acceleration.y / 9.807;
         acc_z = accEvent->acceleration.z / 9.807;
         gyr_x = gyrEvent->gyro.x;
         gyr_y = gyrEvent->gyro.y;
         gyr_z = gyrEvent->gyro.z;
+        or_x = orEvent->orientation.x; // orientation of the sensor with respect to earth and its magnetic field
+        or_y = orEvent->orientation.y;
+        or_z = orEvent->orientation.z;
     }
 
     void printAll()
@@ -108,6 +113,21 @@ namespace imu
     float getGyrZ()
     {
         return gyr_z;
+    }
+
+    float getOrX() // direction of platform (effective yaw)
+    {
+        return or_x;
+    }
+
+    float getOrY()
+    {
+        return or_y;
+    }
+
+    float getOrZ()
+    {
+        return or_z;
     }
 
 }
