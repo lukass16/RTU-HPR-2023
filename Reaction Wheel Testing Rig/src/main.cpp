@@ -16,22 +16,23 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Starting Reaction Wheel Test");
 
-	asyncserver::setup();
-	sdcard::setup();
+	asyncserver::setup();	
 	motor::setup();
 	motor::setupEncoder();
 	imu::setup();
 
-	controler.Kp = 0.8;
-	controler.Ki = 0.2;
-	controler.Kd = 0.2;
-	controler.tau = 0.90;
+	controler.Kp = 0.9;
+	controler.Ki = 5.0;
+	controler.Kd = 0.04;
+	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
 	controler.limMax = 0.95;
 	controler.limMin = -0.95;
 
 	pidcontrol::setup(&controler);
 
+	// setup SD writing
+	sdcard::setup();
 	fileSD = sdcard::openFile();
 	sdcard::writeHeader(fileSD);
 }
@@ -54,8 +55,7 @@ void loop()
 	motor::stabilize(wheelSpeed);
 
 	// save cycle to SD card
-	sdcard::writeData(fileSD, platSpeed, wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
+	sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
 
-	delay(50);
-	
+	delay(50);	
 }

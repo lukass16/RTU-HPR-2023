@@ -79,7 +79,7 @@ namespace motor
     void stabilize(float wheelSpeed)
     {
         static float wheelSpeedPrev = wheelSpeed;
-        
+
         // convert to duty cycle and motor direction output
         if (wheelSpeed != wheelSpeedPrev)
         {

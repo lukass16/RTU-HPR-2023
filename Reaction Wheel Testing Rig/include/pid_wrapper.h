@@ -97,7 +97,7 @@ namespace pidcontrol
 		pid->prevMeasurement = measurement;
 
 		//Serial.println("Err: " + String(error));
-		Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
+		//Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
 
 		return pid->out;
 	}

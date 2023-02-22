@@ -14,7 +14,7 @@
 #define _SD_CS 25
 
 unsigned long SD_time = millis();
-char filename[50] = "piddata.csv";
+char filename[50] = "gains0.csv";
 
 namespace sdcard
 {
@@ -47,7 +47,7 @@ namespace sdcard
 
 	SD_File reloadFile(SD_File fileSD) // returnds file handle
 	{
-		Serial.println("Reloading SD card file");
+		// Serial.println("Reloading SD card file");
 		closeFile(fileSD);
 		return SD.open(filename, FILE_WRITES);
 	}
@@ -92,7 +92,7 @@ namespace sdcard
 	{
 		if (fileSD)
 		{
-			fileSD.println(String(getTimeElapsed(), 4) + "," + String(wheel_spd, 4) + "," + String(plat_vel, 4) + "," + String(Kp, 4) + "," + String(Ki, 4) + "," + String(Kd, 4) + "," + String(P, 4) + "," + String(I, 4) + "," + String(D, 4));
+			fileSD.println(String(getTimeElapsed(), 4) + "," + String(plat_vel, 4) + "," + String(wheel_spd, 4) + "," + String(Kp, 4) + "," + String(Ki, 4) + "," + String(Kd, 4) + "," + String(P, 4) + "," + String(I, 4) + "," + String(D, 4));
 		}
 
 		// automatically closes and reopens file every n readings to avoid lost data
