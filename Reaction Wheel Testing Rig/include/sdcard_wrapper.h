@@ -84,7 +84,7 @@ namespace sdcard
 			return 0;
 		}
 
-		fileSD.println("Time [ms],Plat Ang Vel [rad/s],Wheel Speed [%],KP,KI,KD,P,I,D");
+		fileSD.println("Time [ms],Plat Ang Vel [rad/s],Wheel Speed [%],Kp,Ki,Kd,P,I,D");
 		return 1;
 	}
 
