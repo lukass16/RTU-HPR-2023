@@ -50,22 +50,22 @@ namespace pidcontrol
 		//* Integral clamping logic
 		float limMinInt, limMaxInt;
 
-		if (pid->limMax > pid->proportional)
+		if (pid->limMax > pid->proportional) // if the proportional term is less than the output upper limit
 		{
-			limMaxInt = pid->limMax - pid->proportional;
+			limMaxInt = pid->limMax - pid->proportional; // the limit of the integrator term is what's left up to the maximum
 		}
 		else
 		{
-			limMaxInt = 0.0f;
+			limMaxInt = 0.0f; // else we zero the integral term
 		}
 
-		if (pid->limMin < pid->proportional)
+		if (pid->limMin < pid->proportional) // if the proportional term is more than the output lower limit
 		{
-			limMinInt = pid->limMin - pid->proportional;
+			limMinInt = pid->limMin - pid->proportional; // the limit of the integrator term is what's left down to the minimum
 		}
 		else
 		{
-			limMinInt = 0.0f;
+			limMinInt = 0.0f; // else we zero the integral term
 		}
 
 		if (pid->integrator > limMaxInt)
