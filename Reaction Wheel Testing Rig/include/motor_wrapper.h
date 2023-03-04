@@ -12,11 +12,16 @@
 // https://randomnerdtutorials.com/esp32-pwm-arduino-ide/
 // https://lastminuteengineers.com/handling-esp32-gpio-interrupts-tutorial/
 
-//! TESTING
+
 int dutyCycle = 0, direction = 0;
 volatile int encCounter = 0, encDirection = 0;
 
 void IRAM_ATTR isrA()
+{
+    encCounter++;
+}
+
+void IRAM_ATTR isrAWithDirection()
 {
     encCounter++;
 
@@ -30,7 +35,6 @@ void IRAM_ATTR isrA()
     }
 }
 
-
 namespace motor
 {
     // declaring initial values for PWM channel attributes
@@ -38,7 +42,7 @@ namespace motor
 
     // declaring rotational frequency calculation variables
     float dt;
-    float rotations = 0, rotFreq = 0;
+    float rotations = 0, rotFreq = 0, rotFreqAvgSum = 0, rotFreqAvg = 0, rotFreqAvgCycles = 10, rotFreqAvgCounter = 0;
     unsigned long prevTime, curTime;
 
     void setup()
@@ -101,9 +105,19 @@ namespace motor
         prevTime = curTime;
 
         // calculate rotational frequency
-        rotFreq = (rotations / dt) * encDirection; // sign depends on direction of rotation
-
-        return rotFreq;
+        rotFreq = (rotations / dt); // sign depends on direction of rotation
+        if(rotFreqAvgCounter < rotFreqAvgCycles)
+        {
+            rotFreqAvgSum += rotFreq;
+            rotFreqAvgCounter++;
+        }
+        else
+        {
+            rotFreqAvg = rotFreqAvgSum / rotFreqAvgCycles;
+            rotFreqAvgSum = 0;
+            rotFreqAvgCounter = 0;
+        }
+        return rotFreqAvg;
     }
 
     void stabilize(float wheelSpeed)
