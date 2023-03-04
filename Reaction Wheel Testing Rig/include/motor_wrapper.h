@@ -7,22 +7,29 @@
 #define A_PIN 36
 #define B_PIN 37
 
+#define ENC_COUNTS_PER_REV 100
+
 // https://randomnerdtutorials.com/esp32-pwm-arduino-ide/
 // https://lastminuteengineers.com/handling-esp32-gpio-interrupts-tutorial/
 
 //! TESTING
 int dutyCycle = 0, direction = 0;
-volatile int testCounter = 0;
+volatile int encCounter = 0;
 
 void IRAM_ATTR encoder()
 {
-    testCounter++;
+    encCounter++;
 }
 
 namespace motor
 {
     // declaring initial values for PWM channel attributes
     int freq = 4000, channel = 0, resolution = 8;
+
+    // declaring rotational frequency calculation variables
+    float dt;
+    float rotations = 0, rotFreq = 0;
+    unsigned long prevTime, curTime;
 
     void setup()
     {
@@ -38,12 +45,8 @@ namespace motor
 
     void setupEncoder()
     {
-        attachInterrupt(A_PIN, encoder, RISING);
-    }
-
-    void testEncoder()
-    {
-        Serial.println(testCounter);
+        attachInterrupt(B_PIN, encoder, RISING);
+        prevTime = millis();
     }
 
     void setDutyCycle(int duty_cycle) // 0 - 255
@@ -74,6 +77,25 @@ namespace motor
     int readChannelB()
     {
         return analogRead(B_PIN);
+    }
+
+    float getRotationalFrequency()
+    {
+        // calculate amount of rotations
+        rotations = (float)encCounter / ENC_COUNTS_PER_REV; 
+        encCounter = 0;
+        Serial.println("Rotations:" + String(rotations));
+
+        // calculate change in time
+        curTime = millis();
+        dt = (curTime - prevTime) / 1000.0; // in seconds
+        prevTime = curTime;
+        Serial.println("dt:" + String(dt));
+
+        // calculate rotational frequency
+        rotFreq = rotations / dt;
+
+        return rotFreq;
     }
 
     void stabilize(float wheelSpeed)

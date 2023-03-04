@@ -39,23 +39,26 @@ void setup()
 
 void loop()
 {
-	// if data received, set new PID gains
-	if(asyncserver::hasData())
-	{
-		controler.Kp = asyncserver::getP();
-		controler.Ki = asyncserver::getI();
-		controler.Kd = asyncserver::getD();
-		asyncserver::printGains();
-	}
+	// // if data received, set new PID gains
+	// if(asyncserver::hasData())
+	// {
+	// 	controler.Kp = asyncserver::getP();
+	// 	controler.Ki = asyncserver::getI();
+	// 	controler.Kd = asyncserver::getD();
+	// 	asyncserver::printGains();
+	// }
 
-	imu::readSensor();
-	platSpeed = imu::getGyrZ();
-	wheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
+	// imu::readSensor();
+	// platSpeed = imu::getGyrZ();
+	// wheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
 
-	motor::stabilize(wheelSpeed);
+	// motor::stabilize(wheelSpeed);
 
-	// save cycle to SD card
-	sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
+	// // save cycle to SD card
+	// sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
 
-	delay(50);	
+	// * Testing
+	Serial.println(motor::getRotationalFrequency());
+
+	delay(200);	
 }
