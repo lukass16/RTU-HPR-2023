@@ -16,11 +16,13 @@
 int dutyCycle = 0, direction = 0;
 volatile int encCounter = 0, encDirection = 0;
 
+// ISR routine for only rotational frequency
 void IRAM_ATTR isrA()
 {
     encCounter++;
 }
 
+// ISR routine for rotational frequency and direction
 void IRAM_ATTR isrAWithDirection()
 {
     encCounter++;
