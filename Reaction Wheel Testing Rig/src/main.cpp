@@ -5,6 +5,10 @@
 #include "sdcard_wrapper.h"
 #include "pid_wrapper.h"
 
+//* Testing
+unsigned long prevT = 0;
+int testDutyCycle = 8;
+
 float platSpeed = 0, wheelSpeed = 0;
 
 PIDController controler;
@@ -35,6 +39,10 @@ void setup()
 	sdcard::setup();
 	fileSD = sdcard::openFile();
 	sdcard::writeHeader(fileSD);
+
+	//* Testing
+	motor::setDutyCycle(8);
+	motor::setDirection(0);
 }
 
 void loop()
@@ -56,9 +64,19 @@ void loop()
 
 	// // save cycle to SD card
 	// sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
+	
+	if(millis() - prevT > 2000)
+	{
+		prevT = millis();
+		if(testDutyCycle + 10 < 255){
+			testDutyCycle += 10;
+		}
+		motor::setDutyCycle(testDutyCycle);
+	}
 
 	// * Testing
-	Serial.println(motor::getRotationalFrequency());
+	Serial.println("Wheel rotational frequency: " + String(motor::getRotationalFrequency()) + " Hz");
+	Serial.println("Duty cycle to: " + String(testDutyCycle));
 
-	delay(200);	
+	delay(50);	
 }

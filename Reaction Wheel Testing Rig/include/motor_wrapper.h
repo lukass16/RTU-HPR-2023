@@ -4,8 +4,8 @@
 
 #define PWM_PIN 32
 #define DIRECTION_PIN 33
-#define A_PIN 36
-#define B_PIN 37
+#define A_PIN 37
+#define B_PIN 36 // it was determined that an ISR routine on this pin executes not only when it is rising, but also when pin 37 is falling, be aware of this
 
 #define ENC_COUNTS_PER_REV 100
 
@@ -14,12 +14,22 @@
 
 //! TESTING
 int dutyCycle = 0, direction = 0;
-volatile int encCounter = 0;
+volatile int encCounter = 0, encDirection = 0;
 
-void IRAM_ATTR encoder()
+void IRAM_ATTR isrA()
 {
     encCounter++;
+
+    if (digitalRead(B_PIN) == HIGH)
+    {
+        encDirection = -1;
+    }
+    else
+    {
+        encDirection = 1;
+    }
 }
+
 
 namespace motor
 {
@@ -45,7 +55,7 @@ namespace motor
 
     void setupEncoder()
     {
-        attachInterrupt(B_PIN, encoder, RISING);
+        attachInterrupt(A_PIN, isrA, RISING);
         prevTime = millis();
     }
 
@@ -71,12 +81,12 @@ namespace motor
 
     int readChannelA()
     {
-        return analogRead(A_PIN);
+        return digitalRead(A_PIN);
     }
 
     int readChannelB()
     {
-        return analogRead(B_PIN);
+        return digitalRead(B_PIN);
     }
 
     float getRotationalFrequency()
@@ -84,16 +94,14 @@ namespace motor
         // calculate amount of rotations
         rotations = (float)encCounter / ENC_COUNTS_PER_REV; 
         encCounter = 0;
-        Serial.println("Rotations:" + String(rotations));
 
         // calculate change in time
         curTime = millis();
         dt = (curTime - prevTime) / 1000.0; // in seconds
         prevTime = curTime;
-        Serial.println("dt:" + String(dt));
 
         // calculate rotational frequency
-        rotFreq = rotations / dt;
+        rotFreq = (rotations / dt) * encDirection; // sign depends on direction of rotation
 
         return rotFreq;
     }
@@ -108,12 +116,12 @@ namespace motor
             if (wheelSpeed >= 0)
             {
                 dutyCycle = round(wheelSpeed * 255);
-                direction = 0;
+                direction = 1;
             }
             else
             {
                 dutyCycle = -round(wheelSpeed * 255);
-                direction = 1;
+                direction = 0;
             }
         }
 
