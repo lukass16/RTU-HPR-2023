@@ -52,14 +52,18 @@ namespace sdcard
 		return SD.open(filename, FILE_WRITES);
 	}
 
-	void setFilename(float P, float I, float D)
+	void setFilename(String filenamestr)
+	{
+		filenamestr.toCharArray(filename, 50);
+	}
+
+	void setFilenamePID(float P, float I, float D)
 	{
 		String _filename = String(P*100, 0) + "_" + String(I*100, 0) + "_" + String(D*100, 0) + ".csv";
 		_filename.toCharArray(filename, 50);
 		Serial.println("Set filename as: " + _filename);
 	}
 	
-
 	float getTimeElapsed()
 	{
 		return millis() - SD_time;
@@ -88,6 +92,30 @@ namespace sdcard
 		return 1;
 	}
 
+	int writeHeaderTest1(SD_File fileSD)
+	{
+		if (!fileSD)
+		{
+			Serial.println("Unable to write to SD card");
+			return 0;
+		}
+
+		fileSD.println("Time [ms],Motor Power [8bit int],Motor RPM [1/min]");
+		return 1;
+	}
+
+	int writeHeaderTest3(SD_File fileSD)
+	{
+		if (!fileSD)
+		{
+			Serial.println("Unable to write to SD card");
+			return 0;
+		}
+
+		fileSD.println("Time [ms],Motor Power [8bit int],Motor RPM [1/min],Platform RPM [1/min]");
+		return 1;
+	}
+
 	void writeData(SD_File fileSD, float plat_vel, float wheel_spd, float Kp, float Ki, float Kd, float P, float I, float D)
 	{
 		if (fileSD)
@@ -104,6 +132,22 @@ namespace sdcard
 		else
 		{
 			sdIterator++;
+		}
+	}
+
+	void writeDataTest1(SD_File fileSD, float elapsedTime, float dutyCycle, float rpm)
+	{
+		if (fileSD)
+		{
+			fileSD.println(String(elapsedTime, 4) + "," + String(dutyCycle, 4) + "," + String(rpm, 4));
+		}
+	}
+
+	void writeDataTest3(SD_File fileSD, float elapsedTime, float dutyCycle, float rpm, float platrpm)
+	{
+		if (fileSD)
+		{
+			fileSD.println(String(elapsedTime, 4) + "," + String(dutyCycle, 4) + "," + String(rpm, 4) + "," + String(platrpm, 4));
 		}
 	}
 

@@ -130,4 +130,9 @@ namespace imu
         return or_z;
     }
 
+    float getRPM()
+    {
+        return gyr_z * 60 / 2 / PI; // converting from radians/s to rotations/min
+    }
+
 }

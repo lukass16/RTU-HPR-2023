@@ -33,32 +33,32 @@ void setup()
 
 	// setup SD writing
 	sdcard::setup();
-	fileSD = sdcard::openFile();
-	sdcard::writeHeader(fileSD);
+	// fileSD = sdcard::openFile();
+	// sdcard::writeHeader(fileSD);
+
+	//* Testing
+	motor::test3();
 }
 
 void loop()
 {
-	// if data received, set new PID gains
-	if(asyncserver::hasData())
-	{
-		controler.Kp = asyncserver::getP();
-		controler.Ki = asyncserver::getI();
-		controler.Kd = asyncserver::getD();
-		asyncserver::printGains();
-	}
+	// // if data received, set new PID gains
+	// if(asyncserver::hasData())
+	// {
+	// 	controler.Kp = asyncserver::getP();
+	// 	controler.Ki = asyncserver::getI();
+	// 	controler.Kd = asyncserver::getD();
+	// 	asyncserver::printGains();
+	// }
 
-	imu::readSensor();
-	platSpeed = imu::getGyrZ();
-	wheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
+	// imu::readSensor();
+	// platSpeed = imu::getGyrZ();
+	// wheelSpeed = pidcontrol::update(&controler, 0, platSpeed);
 
-	motor::stabilize(wheelSpeed);
+	// motor::stabilize(wheelSpeed);
 
-	// save cycle to SD card
-	sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
+	// // save cycle to SD card
+	// sdcard::writeData(fileSD, imu::getGyrZ(), wheelSpeed, controler.Kp, controler.Ki, controler.Kd, controler.proportional, controler.integrator, controler.differentiator);
 
-	// * Testing
-	Serial.println("Wheel rotational frequency: " + String(motor::getRotationalFrequency()) + " Hz");
-
-	delay(50);	
+	delay(100);	
 }
