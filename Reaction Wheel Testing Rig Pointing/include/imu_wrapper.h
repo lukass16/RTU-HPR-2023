@@ -20,9 +20,6 @@ namespace imu
 {
     float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, or_x, or_y, or_z, tmp;
 
-    // variables for custom orientation
-    float prevOr = 0, dOr = 0;
-
     void setup()
     {
         Serial.println("Initializing BNO055");
@@ -136,26 +133,6 @@ namespace imu
     float getRPM()
     {
         return gyr_z * 60 / 2 / PI; // converting from radians/s to rotations/min
-    }
-
-    // custom orientation function
-    float getPlatOrientation() 
-    {
-        static float platOrientation = or_x; // for first function call, set the platform orientation to the sensor reading
-        dOr = or_x - prevOr;
-        // if the difference is very large, we traveled over the 0 degree mark and need to correct
-        if(dOr > 340)
-        {
-            dOr -= 360; 
-        }
-        else if(dOr < -340)
-        {
-            dOr += 360; 
-        }
-        platOrientation += dOr; // only control the platform orientation variable through the dOr variable
-
-        prevOr = or_x;
-        return platOrientation;
     }
 
 }
