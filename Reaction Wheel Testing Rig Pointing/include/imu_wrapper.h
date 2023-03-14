@@ -20,6 +20,9 @@ namespace imu
 {
     float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, or_x, or_y, or_z, tmp;
 
+    // variables for platform orientation
+    float dor_x = 0, prev_or_x = 0;
+
     void setup()
     {
         Serial.println("Initializing BNO055");
@@ -133,6 +136,33 @@ namespace imu
     float getRPM()
     {
         return gyr_z * 60 / 2 / PI; // converting from radians/s to rotations/min
+    }
+
+    float getPlatOrientation()
+    {
+        static float platOrientation = or_x; // for first reading start with the current orientation
+
+        /* Note: the platform orientation in its current implementation does not really have 
+        a repeatable refference point as it takes time for the sensor to calibrate itself 
+        and determine it's orientation, by which time the platform orientation has already been set to some initial value
+        */
+
+        dor_x = or_x - prev_or_x;
+
+        // handle jump cases
+        if(dor_x > 330)
+        {
+            dor_x -= 360;
+        }
+        else if(dor_x < -330)
+        {
+            dor_x += 360;
+        }
+
+        platOrientation += dor_x; // add the change in orientation to the platform orientation
+
+        prev_or_x = or_x; 
+        return platOrientation;
     }
 
 }

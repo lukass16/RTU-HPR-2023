@@ -72,9 +72,9 @@ String processor(const String &var)
 	{
 		String form = "";
 		form += "<form onsubmit=\"handleSubmit(this)\">";
-		form += "<h4>P - Gain</h4><input type=\"text\" name=\"P\" value=\"" + String(gains.P, 2) + "\">";
-		form += "<h4>I - Gain</h4><input type=\"text\" name=\"I\" value=\"" + String(gains.I, 2) + "\">";
-		form += "<h4>D - Gain</h4><input type=\"text\" name=\"D\" value=\"" + String(gains.D, 2) + "\">";
+		form += "<h4>P - Gain</h4><input type=\"text\" name=\"P\" value=\"" + String(gains.P, 4) + "\">";
+		form += "<h4>I - Gain</h4><input type=\"text\" name=\"I\" value=\"" + String(gains.I, 4) + "\">";
+		form += "<h4>D - Gain</h4><input type=\"text\" name=\"D\" value=\"" + String(gains.D, 4) + "\">";
 		form += "<br><input type=\"submit\"></form>";
 		return form;
 	}

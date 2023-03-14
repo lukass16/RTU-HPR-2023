@@ -130,7 +130,7 @@ namespace motor
 
     void stabilize(float wheelSpeed)
     {
-        static float wheelSpeedPrev = wheelSpeed;
+        static float wheelSpeedPrev = 0;
 
         // convert to duty cycle and motor direction output
         if (wheelSpeed != wheelSpeedPrev)
@@ -156,14 +156,26 @@ namespace motor
         wheelSpeedPrev = wheelSpeed;
     }
 
+    void testCountdown()
+    {
+        int duration = 5;
+        Serial.print("Starting test in:");
+        for(int i = 0; i < duration; i++)
+        {
+            Serial.print(" " + String(duration - i));
+            delay(1000);
+        }
+        Serial.println();
+    }
+
     // Motor test sequences
     void test1()
     {
         // declare test parameters
-        int spinUpTime = 10000;                // spin up time in ms
-        int spinTotalTime = 50000;            // spin time at max in ms
+        int spinUpTime = 5000;                // spin up time in ms
+        int spinTotalTime = 100000;            // spin time at max in ms
         int incrementTime = spinUpTime / 255; // time between increments in ms
-        String filename = "test1_4.csv";
+        String filename = "test1_41.csv";
 
         // open file for writing
         sdcard::setFilename(filename);
@@ -183,6 +195,7 @@ namespace motor
                 prevTimeTest = millis();
                 motor::setDutyCycle(dutyCycle);
                 Serial.println("Duty cycle: " + String(dutyCycle));
+                Serial.println("RPM: " + String(rpm));
             }
 
             // write to SD card
@@ -202,9 +215,9 @@ namespace motor
     {
         // declare test parameters
         int spinUpTime = 15000;                // spin up time in ms
-        int spinTotalTime = 25000;            // spin time at max in ms
+        int spinTotalTime = 50000;            // spin time at max in ms
         int incrementTime = spinUpTime / 255; // time between increments in ms
-        String filename = "test3_5.csv";
+        String filename = "test3_1.csv";
 
         // open file for writing
         sdcard::setFilename(filename);

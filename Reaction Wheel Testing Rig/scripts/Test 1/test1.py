@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 """ SETUP """
-ID = 3
+ID = 4
 
 
 plt.style.use("default")
@@ -51,4 +51,4 @@ ax2color = "coral"
 ax2.set_ylabel('Motor RPM [1/min]', color=ax2color)
 ax2.plot(t, rpm, color=ax2color)
 ax2.tick_params(axis='y', labelcolor=ax2color)
-plt.savefig("merge_{}.png".format(ID), dpi=300)
+#plt.savefig("merge_{}.png".format(ID), dpi=300)

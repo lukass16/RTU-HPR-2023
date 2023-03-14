@@ -130,7 +130,7 @@ namespace motor
 
     void stabilize(float wheelSpeed)
     {
-        static float wheelSpeedPrev = wheelSpeed;
+        static float wheelSpeedPrev = 0;
 
         // convert to duty cycle and motor direction output
         if (wheelSpeed != wheelSpeedPrev)
@@ -138,12 +138,12 @@ namespace motor
             if (wheelSpeed >= 0)
             {
                 dutyCycle = round(wheelSpeed * 255);
-                direction = 1;
+                direction = 0;
             }
             else
             {
                 dutyCycle = -round(wheelSpeed * 255);
-                direction = 0;
+                direction = 1;
             }
         }
 
@@ -154,6 +154,18 @@ namespace motor
         motor::setDirection(direction);
 
         wheelSpeedPrev = wheelSpeed;
+    }
+
+    void testCountdown()
+    {
+        int duration = 5;
+        Serial.print("Starting test in:");
+        for(int i = 0; i < duration; i++)
+        {
+            Serial.print(" " + String(duration - i));
+            delay(1000);
+        }
+        Serial.println();
     }
 
     // Motor test sequences
