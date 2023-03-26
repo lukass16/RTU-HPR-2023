@@ -25,13 +25,21 @@ void setup()
 	motor::setupEncoder();
 	imu::setup();
 
-	controler.Kp = 0.001; //* Notes while testing: 0.003-0.01 seems like an ok sensitivity range for solely P term
-	controler.Ki = 0.0001;
-	controler.Kd = -0.0006;
+	controler.Kp = 0.003; //* Notes while testing: 0.003-0.01 seems like an ok sensitivity range for solely P term
+	controler.Ki = 0.0005;
+	controler.Kd = -0.002;
 	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
 	controler.limMax = 0.65; //* Notes while testing: 0.3-0.5 seems like an ok range for the limit values
 	controler.limMin = -0.65; 
+	/*
+	Note: The tuning gains for pointing are much more sensitive than for stabilising
+	Some ok parameters used in the past:
+	Nr |	P 	|  	I 	 |	 D 	 |
+	1  |  0.001 | 0.0001 |-0.0006|
+	2  |  0.003 | 0.0005 |-0.002 |
+	| 0.001 | 0.0001|-0.0006|
+	*/
 
 	pidcontrol::setup(&controler);
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "imu_wrapper.h"
 
 struct PIDController
 {
@@ -78,7 +79,7 @@ namespace pidcontrol
 		}
 
 		//* Derivative component calculations
-		pid->differentiator = (2.0f * pid->Kd * (measurement - pid->prevMeasurement) + (2.0f * pid->tau - pid->T) * pid->differentiator) / (2.0f * pid->tau + pid->T);
+		pid->differentiator = pid->Kd * (- imu::getGyrZ() * 180 / PI); //(2.0f * pid->Kd * (measurement - pid->prevMeasurement) + (2.0f * pid->tau - pid->T) * pid->differentiator) / (2.0f * pid->tau + pid->T);
 
 		//* Total output calculations
 		pid->out = pid->proportional + pid->integrator + pid->differentiator;
