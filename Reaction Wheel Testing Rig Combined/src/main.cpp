@@ -6,9 +6,13 @@
 #include "pid_wrapper.h"
 #include "buzzer.h"
 
-float platOrientation = 0, wheelSpeed = 0;
+//* Testing
+unsigned long prev_t = millis();
+
+float wheelSpeed = 0;
 
 PIDController controler;
+PIDMode mode = STABILIZE;
 
 SD_File fileSD;
 
@@ -25,20 +29,13 @@ void setup()
 	motor::setupEncoder();
 	imu::setup();
 
-	controler.Kp = 0.003; //* Notes while testing: 0.003-0.01 seems like an ok sensitivity range for solely P term
+	controler.Kp = 0.003; 
 	controler.Ki = 0.0005;
 	controler.Kd = -0.002;
 	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
-	controler.limMax = 0.95; //* Notes while testing: 0.3-0.5 seems like an ok range for the limit values
+	controler.limMax = 0.95; 
 	controler.limMin = -0.95; 
-	/*
-	Note: The tuning gains for pointing are much more sensitive than for stabilising
-	Some ok parameters used in the past:
-	Nr |	P 	|  	I 	 |	 D 	 |
-	1  |  0.001 | 0.0001 |-0.0006|
-	2  |  0.003 | 0.0005 |-0.002 |
-	*/
 
 	pidcontrol::setup(&controler);
 
@@ -60,12 +57,40 @@ void loop()
 		asyncserver::printGains();
 	}
 
-	imu::readSensor();
-	platOrientation = imu::getPlatOrientation(); // using as the process variable our own platform orientation
-	wheelSpeed = pidcontrol::update(&controler, 160, platOrientation);
+	//* Changing modes for test
+	if(mode == STABILIZE)
+	{
+		imu::readSensor();
+		wheelSpeed = pidcontrol::update(&controler, 0);
+	}
+	else if(mode == POINT)
+	{
+		imu::readSensor();
+		wheelSpeed = pidcontrol::update(&controler, 160);
+	}
+	if(millis() - prev_t > 10000)
+	{
+		prev_t = millis();
+		if(mode == STABILIZE)
+		{
+			mode = POINT;
+			pidcontrol::setMode(&controler, mode);
+			buzzer::signalPointMode();
+		}
+		else if(mode == POINT)
+		{
+			mode = STABILIZE;
+			pidcontrol::setMode(&controler, mode);
+			buzzer::signalStabilizeMode();
+		}
+	}
+
+	
 	//* Testing
+	pidcontrol::printMode(&controler);
 	Serial.println("Wheel Speed: " + String(wheelSpeed, 2));
-	Serial.println("Plat Orientation: " + String(platOrientation, 2));
+	Serial.println("Plat Angular Velocity: " + String(imu::getGyrZ(), 2));
+	Serial.println("Plat Orientation: " + String(imu::getPlatOrientation(), 2));
 	pidcontrol::printTerms(&controler);
 
 

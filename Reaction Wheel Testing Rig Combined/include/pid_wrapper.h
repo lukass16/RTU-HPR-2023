@@ -1,8 +1,15 @@
 #pragma once
 #include "imu_wrapper.h"
 
+enum PIDMode
+{
+	STABILIZE,
+	POINT
+};
+
 struct PIDController
 {
+	PIDMode mode;
 
 	float Kp;
 	float Ki;
@@ -19,6 +26,7 @@ struct PIDController
 	float integrator;
 	float prevError;
 	float differentiator;
+	float measurement;
 	float prevMeasurement;
 
 	float out;
@@ -28,8 +36,19 @@ namespace pidcontrol
 {
 	void setup(PIDController *pid)
 	{
+		pid->mode = STABILIZE;
+
+		// setup controller with stabilizing gains
+		pid->Kp = 0.9;
+		pid->Ki = 5.0;
+		pid->Kd = 0.04;
+		pid->tau = 0.9;
+		pid->T = 0.05; // sample time in sec
+		pid->limMax = 0.95;
+		pid->limMin = -0.95;
+
 		pid->proportional = 0.0f;
-		pid->integrator = 0.5f; //! Testing
+		pid->integrator = 0.0f;
 		pid->prevError = 0.0f;
 
 		pid->differentiator = 0.0f;
@@ -38,9 +57,19 @@ namespace pidcontrol
 		pid->out = 0.0f;
 	}
 
-	float update(PIDController *pid, float setpoint, float measurement)
+	float update(PIDController *pid, float setpoint)
 	{
-		float error = setpoint - measurement;
+		//* automatically retrieve required measurement based on mode
+		if (pid->mode == STABILIZE)
+		{
+			pid->measurement = imu::getGyrZ(); // measure angular velocity
+		}
+		else if (pid->mode == POINT)
+		{
+			pid->measurement = imu::getPlatOrientation(); // measure platform orientation (custom variable)
+		}
+
+		float error = setpoint - pid->measurement;
 
 		//* Proportional component calculations
 		pid->proportional = pid->Kp * error;
@@ -79,7 +108,14 @@ namespace pidcontrol
 		}
 
 		//* Derivative component calculations
-		pid->differentiator = pid->Kd * (- imu::getGyrZ() * 180 / PI); //(2.0f * pid->Kd * (measurement - pid->prevMeasurement) + (2.0f * pid->tau - pid->T) * pid->differentiator) / (2.0f * pid->tau + pid->T);
+		if (pid->mode == STABILIZE)
+		{
+			pid->differentiator = (2.0f * pid->Kd * (pid->measurement - pid->prevMeasurement) + (2.0f * pid->tau - pid->T) * pid->differentiator) / (2.0f * pid->tau + pid->T);
+		}
+		else if (pid->mode == POINT)
+		{
+			pid->differentiator = pid->Kd * (imu::getGyrZ() * 180 / PI);
+		}
 
 		//* Total output calculations
 		pid->out = pid->proportional + pid->integrator + pid->differentiator;
@@ -95,43 +131,52 @@ namespace pidcontrol
 		}
 
 		pid->prevError = error;
-		pid->prevMeasurement = measurement;
-
-		// Serial.println("Err: " + String(error));
+		pid->prevMeasurement = pid->measurement;
 
 		return pid->out;
 	}
 
-	float incrementWheelSpeed(float wheelSpeed, float dWheelSpeed)
+	void setMode(PIDController *pid, PIDMode mode)
 	{
-		if (dWheelSpeed > 0)
+		if (mode == STABILIZE)
 		{
-			if (wheelSpeed + dWheelSpeed < 0.95)
-			{
-				wheelSpeed += dWheelSpeed;
-			}
-			else
-			{
-				wheelSpeed = 0.95;
-			}
+			pid->Kp = 0.9;
+			pid->Ki = 5.0;
+			pid->Kd = 0.04;
+
+			// keep only the integral term
+			pid->proportional = 0;
+			pid->differentiator = 0;
+			pid->prevMeasurement = imu::getGyrZ();
 		}
-		else if (dWheelSpeed < 0)
+		else if (mode == POINT)
 		{
-			if (wheelSpeed + dWheelSpeed > -0.95)
-			{
-				wheelSpeed += dWheelSpeed;
-			}
-			else
-			{
-				wheelSpeed = -0.95;
-			}
+			pid->Kp = 0.003;
+			pid->Ki = 0.0005;
+			pid->Kd = -0.002;
+
+			// keep only the integral term
+			pid->proportional = 0;
+			pid->differentiator = 0;
+			pid->prevMeasurement = imu::getPlatOrientation();
 		}
-		return wheelSpeed;
+		pid->mode = mode;
 	}
 
 	//* Testing purposes
+	void printMode(PIDController *pid)
+	{
+		if(pid->mode == STABILIZE)
+		{
+			Serial.println("Mode: STABILIZE");
+		}
+		else if(pid->mode == POINT)
+		{
+			Serial.println("Mode: POINT");
+		}
+	}
 	void printTerms(PIDController *pid)
 	{
-		Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
+		Serial.println("P:" + String(pid->proportional) + " I:" + String(pid->integrator) + " D:" + String(pid->differentiator));
 	}
 };
