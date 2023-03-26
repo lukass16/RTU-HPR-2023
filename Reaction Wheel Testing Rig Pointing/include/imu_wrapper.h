@@ -21,7 +21,7 @@ namespace imu
     float acc_x, acc_y, acc_z, gyr_x, gyr_y, gyr_z, or_x, or_y, or_z, tmp;
 
     // variables for platform orientation
-    float dor_x = 0, prev_or_x = 0;
+    float dor_x = 0, prev_or_x = 0, platOrientation = -1;
 
     void setup()
     {
@@ -103,6 +103,7 @@ namespace imu
         Serial.println(err);
     }
 
+
     float getGyrX()
     {
         return gyr_x;
@@ -138,14 +139,15 @@ namespace imu
         return gyr_z * 60 / 2 / PI; // converting from radians/s to rotations/min
     }
 
+    float setPlatOrientation(float _platOrientation)
+    {
+        platOrientation = _platOrientation;
+        return platOrientation;
+    }
+
     float getPlatOrientation()
     {
-        static float platOrientation = or_x; // for first reading start with the current orientation
-
-        /* Note: the platform orientation in its current implementation does not really have 
-        a repeatable refference point as it takes time for the sensor to calibrate itself 
-        and determine it's orientation, by which time the platform orientation has already been set to some initial value
-        */
+        static bool firstFlag = 1;
 
         dor_x = or_x - prev_or_x;
 
@@ -159,10 +161,54 @@ namespace imu
             dor_x += 360;
         }
 
+        if(firstFlag) // for first call just setup the function
+        {
+            dor_x = 0;
+            firstFlag = 0;
+        }
         platOrientation += dor_x; // add the change in orientation to the platform orientation
 
         prev_or_x = or_x; 
         return platOrientation;
     }
 
+    void bruteForceCalibration()
+    {
+        int systemCalCount = 0;
+        uint8_t system, gyro, accel, mag = 0;
+        bno.getCalibration(&system, &gyro, &accel, &mag);
+        while (systemCalCount < 20)
+        {
+            // display calibration values
+            bno.getCalibration(&system, &gyro, &accel, &mag);
+            Serial.println();
+            Serial.print("Calibration: Sys=");
+            Serial.print(system);
+            Serial.print(" Gyro=");
+            Serial.print(gyro);
+            Serial.print(" Accel=");
+            Serial.print(accel);
+            Serial.print(" Mag=");
+            Serial.println(mag);
+
+            // update system calibration count
+            if(system == 3)
+            {
+                systemCalCount++;
+            }
+            else
+            {
+                systemCalCount = 0;
+            }
+
+            // display orientation in x axis
+            imu::readSensor();
+            Serial.println("Or x: " + String(or_x, 2));
+            delay(100);
+        }
+
+        // set initial orientation
+        imu::readSensor();
+        imu::setPlatOrientation(or_x);
+    }
 }

@@ -14,7 +14,7 @@ struct PIDController
 
 	float T; // sample time in sec
 
-    float proportional;
+	float proportional;
 	float integrator;
 	float prevError;
 	float differentiator;
@@ -25,7 +25,7 @@ struct PIDController
 
 namespace pidcontrol
 {
-	void setup(PIDController* pid)
+	void setup(PIDController *pid)
 	{
 		pid->proportional = 0.0f;
 		pid->integrator = 0.0f;
@@ -37,7 +37,7 @@ namespace pidcontrol
 		pid->out = 0.0f;
 	}
 
-	float update(PIDController* pid, float setpoint, float measurement)
+	float update(PIDController *pid, float setpoint, float measurement)
 	{
 		float error = setpoint - measurement;
 
@@ -96,10 +96,41 @@ namespace pidcontrol
 		pid->prevError = error;
 		pid->prevMeasurement = measurement;
 
-		//Serial.println("Err: " + String(error));
-		//Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
+		// Serial.println("Err: " + String(error));
 
 		return pid->out;
 	}
 
+	float incrementWheelSpeed(float wheelSpeed, float dWheelSpeed)
+	{
+		if (dWheelSpeed > 0)
+		{
+			if (wheelSpeed + dWheelSpeed < 0.95)
+			{
+				wheelSpeed += dWheelSpeed;
+			}
+			else
+			{
+				wheelSpeed = 0.95;
+			}
+		}
+		else if (dWheelSpeed < 0)
+		{
+			if (wheelSpeed + dWheelSpeed > -0.95)
+			{
+				wheelSpeed += dWheelSpeed;
+			}
+			else
+			{
+				wheelSpeed = -0.95;
+			}
+		}
+		return wheelSpeed;
+	}
+
+	//* Testing purposes
+	void printTerms(PIDController *pid)
+	{
+		Serial.println("P:"+String(pid->proportional)+" I:"+String(pid->integrator)+" D:"+String(pid->differentiator));
+	}
 };
