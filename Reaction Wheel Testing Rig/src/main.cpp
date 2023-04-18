@@ -19,7 +19,7 @@ void setup()
 	// asyncserver::setup();	
 	motor::setup();
 	motor::setupEncoder();
-	imu::setup();
+	//imu::setup();
 
 	// controler.Kp = 0.9;
 	// controler.Ki = 5.0;
@@ -38,7 +38,7 @@ void setup()
 
 	//* Testing
 	motor::testCountdown();
-	motor::test3();
+	motor::test1();
 }
 
 void loop()

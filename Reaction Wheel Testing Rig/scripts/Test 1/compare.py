@@ -19,21 +19,21 @@ data0 = pd.read_csv("TEST1_01.csv".format(ID), sep=',')
 data1 = pd.read_csv("TEST1_11.csv".format(ID), sep=',')
 data2 = pd.read_csv("TEST1_21.csv".format(ID), sep=',')
 data3 = pd.read_csv("TEST1_31.csv".format(ID), sep=',')
-data4 = pd.read_csv("TEST1_41.csv".format(ID), sep=',')
+#data4 = pd.read_csv("TEST1_41.csv".format(ID), sep=',')
 
 # Extracting the data to lists
 t0 = data0["Time [ms]"].to_list()
 t1 = data1["Time [ms]"].to_list()
 t2 = data2["Time [ms]"].to_list()
 t3 = data3["Time [ms]"].to_list()
-t4 = data4["Time [ms]"].to_list()
-p4 = data4["Motor Power [8bit int]"].to_list()
+#t4 = data4["Time [ms]"].to_list()
+p3 = data3["Motor Power [8bit int]"].to_list()
 
 rpm0 = data0["Motor RPM [1/min]"].to_list()
 rpm1 = data1["Motor RPM [1/min]"].to_list()
 rpm2 = data2["Motor RPM [1/min]"].to_list()
 rpm3 = data3["Motor RPM [1/min]"].to_list()
-rpm4 = data4["Motor RPM [1/min]"].to_list()
+#rpm4 = data4["Motor RPM [1/min]"].to_list()
 
 
 '''
@@ -57,7 +57,8 @@ fig, ax1 = plt.subplots(figsize=(16,8))
 ax1color = "b"
 ax1.set_xlabel('Time [ms]')
 ax1.set_ylabel('Motor Power [8bit int]', color=ax1color)
-ax1.plot(t4, p4, color=ax1color)
+
+ax1.plot(t3, p3, color=ax1color)
 ax1.tick_params(axis='y', labelcolor=ax1color)
 
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
@@ -67,7 +68,7 @@ ax2.plot(t0, rpm0, color="k", label="no wheel")
 ax2.plot(t1, rpm1, color="m", label="1 wheel")
 ax2.plot(t2, rpm2, color="r", label="2 wheels")
 ax2.plot(t3, rpm3, color="g", label="3 wheels")
-ax2.plot(t4, rpm4, color="coral", label="4 wheels")
+#ax2.plot(t4, rpm4, color="coral", label="4 wheels")
 ax2.legend()
 ax2.tick_params(axis='y', labelcolor=ax2color)
 plt.savefig("compare.png".format(ID), dpi=300)

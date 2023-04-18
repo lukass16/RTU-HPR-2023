@@ -175,7 +175,7 @@ namespace motor
         int spinUpTime = 5000;                // spin up time in ms
         int spinTotalTime = 100000;            // spin time at max in ms
         int incrementTime = spinUpTime / 255; // time between increments in ms
-        String filename = "test1_41.csv";
+        String filename = "test1_03.csv";
 
         // open file for writing
         sdcard::setFilename(filename);
