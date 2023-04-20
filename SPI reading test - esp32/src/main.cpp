@@ -6,7 +6,7 @@
 #define S_MOSI 12
 #define S_MISO 13
 
-// https://github.com/hideakitai/ESP32SPISlave
+// https://github.com/hideakitai/ESP32DMASPI
 
 ESP32DMASPI::Slave slave;
 
@@ -16,6 +16,8 @@ uint8_t *spi_slave_rx_buf;
 
 void setup()
 {
+	Serial.begin(115200);
+	Serial.println("Starting SPI read test");
 	// to use DMA buffer, use these methods to allocate buffer
 	spi_slave_tx_buf = slave.allocDMABuffer(BUFFER_SIZE);
 	spi_slave_rx_buf = slave.allocDMABuffer(BUFFER_SIZE);
@@ -37,14 +39,14 @@ void loop()
 	}
 
 	// if transaction has completed from master, available() returns size of results of transaction and buffer is automatically updated
-
 	while (slave.available())
 	{
-		for(int i = 0; i < BUFFER_SIZE; i++)
+		//Serial.println(slave.available());
+		for(int i = 0; i < 15; i++)
 		{
-			Serial.print(spi_slave_rx_buf[i]);
+			Serial.print(String(spi_slave_rx_buf[i]) + " ");
 		}
-		Serial.println();
+		Serial.println("Received: " + String(slave.available()));
 
 		slave.pop();
 	}
