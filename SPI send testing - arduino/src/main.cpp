@@ -31,23 +31,48 @@ void setup()
 
 void loop()
 {
-	Serial.print("Sending: ");
+	Serial.print("Sending command 0x07.");
+
+	//* Send command
 	SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
 	// Set the CS pin low to select the slave
 	digitalWrite(CS, LOW);
 	// Transfer byte to the slave
-	uint8_t b = 0x00;
-	Serial.print("Received bytes: ");
-	for (int i = 0; i < 32; i++)
+	uint8_t send = 0x07;
+	SPI.transfer(send);
+	// Set the CS pin high to deselect the slave
+	digitalWrite(CS, HIGH);
+	SPI.endTransaction();
+
+	delayMicroseconds(1000); // there need to be a delay between transactions as both sides need to update and clear buffers
+
+	//* Receive answer
+	SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0));
+	// Set the CS pin low to select the slave
+	digitalWrite(CS, LOW);
+	// Retrieve answers
+	Serial.print("\tReceived response: ");
+	for (int i = 0; i < 8; i++) // retrieving 8 bytes
 	{
-		byte received = SPI.transfer(b);
+		byte received = SPI.transfer(0); // transfer dummy data - get back answer
 		Serial.print(String(received) + " ");
-		b++;
 		delayMicroseconds(20);
 	}
 	Serial.println();
-
 	// Set the CS pin high to deselect the slave
 	digitalWrite(CS, HIGH);
-	delay(50);
+	SPI.endTransaction();
+
+	delay(1000);
 }
+
+// uint8_t b = 0x00;
+// Serial.print("Received bytes: ");
+// for (int i = 0; i < 4; i++)
+// {
+// 	byte received = SPI.transfer(b);
+// 	Serial.print(String(received) + " ");
+// 	b++;
+// 	delayMicroseconds(20);
+// }
+// Serial.println();
