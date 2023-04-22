@@ -25,22 +25,34 @@ void setup()
 	slave.setDataMode(SPI_MODE0);
 	// use HSPI with our own pin assignment
 	slave.begin(HSPI, S_SCK, S_MISO, S_MOSI, S_CS);
+
+	// for safety - setting pins accordingly
+	pinMode(S_SCK, INPUT);
+	pinMode(S_MOSI, INPUT);
+
+	pinMode(S_MISO, OUTPUT);
+
+	//* Create custom value for tx buffer testing
+	for (uint8_t i = 0; i < BUFFER_SIZE; i++)
+	{
+		spi_slave_tx_buf[i] = i;
+	}
 }
 
 void loop()
 {
-	// block until the transaction comes from master
+	// block until the transaction comes from master - simultaneously send active data in tx buffer 
 	slave.wait(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
 
 	// if transaction has completed from master, available() returns size of results of transaction and `spi_slave_rx_buf` is automatically updated
 	while (slave.available())
 	{
-		for(int i = 0; i < 15; i++)
+		Serial.println("Received: " + String(slave.available()));
+		for (int i = 0; i < 15; i++)
 		{
 			Serial.print(String(spi_slave_rx_buf[i]) + " ");
 		}
-		Serial.println("Received: " + String(slave.available()));
-
+		
 		slave.pop(); // pop the oldest transaction result
 	}
 }

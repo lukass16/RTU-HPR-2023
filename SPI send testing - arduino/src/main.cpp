@@ -9,6 +9,15 @@
 // https://forum.arduino.cc/t/how-to-receive-data-via-spi/251768
 // http://www.gammon.com.au/forum/?id=10892&reply=1#reply1
 
+//? Notes:
+/*
+1) Test one byte transactions
+2) check pins - test other pins
+3) read about special pin definitions
+4) test from 2 separate PCs
+- when removing (grounding) MOSI pin (12) teh data comes through
+*/
+
 void setup()
 {
 	Serial.begin(9600);
@@ -28,11 +37,13 @@ void loop()
 	digitalWrite(CS, LOW);
 	// Transfer byte to the slave
 	uint8_t b = 0x00;
-	for (int i = 0; i < 10; i++)
+	Serial.print("Received bytes: ");
+	for (int i = 0; i < 32; i++)
 	{
-		SPI.transfer(b);
-		//Serial.print(String(b) + " ");
+		byte received = SPI.transfer(b);
+		Serial.print(String(received) + " ");
 		b++;
+		delayMicroseconds(20);
 	}
 	Serial.println();
 
