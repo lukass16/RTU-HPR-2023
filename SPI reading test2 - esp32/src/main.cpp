@@ -9,6 +9,9 @@
 // https://github.com/hideakitai/ESP32DMASPI
 // https://forum.arduino.cc/t/how-to-receive-data-via-spi/251768
 
+//* Testing variables
+bool command_active = 0;
+
 ESP32SPISlave slave;
 
 static constexpr uint32_t BUFFER_SIZE{32};
@@ -41,18 +44,50 @@ void setup()
 
 void loop()
 {
-	// block until the transaction comes from master - simultaneously send active data in tx buffer 
+	// block until the transaction comes from master - simultaneously send active data in tx buffer
 	slave.wait(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
 
 	// if transaction has completed from master, available() returns size of results of transaction and `spi_slave_rx_buf` is automatically updated
 	while (slave.available())
 	{
-		Serial.println("Received: " + String(slave.available()));
-		for (int i = 0; i < 15; i++)
+		// check if command
+		if (spi_slave_rx_buf[0] == 0x07)
 		{
-			Serial.print(String(spi_slave_rx_buf[i]) + " ");
+			Serial.println("Received command: " + String(spi_slave_rx_buf[0]));
+			command_active = 1;
+			for (uint8_t i = 0; i < 8; i++) // set sendable data
+			{
+				spi_slave_tx_buf[i] = 237 + i;
+			}
+			Serial.print("Set new tx buffer: ");
+			for (int i = 0; i < 8; i++)
+			{
+				Serial.print(String(spi_slave_tx_buf[i]) + " ");
+			}
+			Serial.println("\n");
 		}
-		
+		else
+		{
+			Serial.print("Received dummy data: ");
+			for (int i = 0; i < 8; i++)
+			{
+				Serial.print(String(spi_slave_rx_buf[i]) + " ");
+			}
+			Serial.println();
+
+			command_active = 0;
+			for (uint8_t i = 0; i < 8; i++) // reset tx buffer to zeros
+			{
+				spi_slave_tx_buf[i] = 0;
+			}
+			Serial.print("Reset tx buffer: ");
+			for (int i = 0; i < 8; i++)
+			{
+				Serial.print(String(spi_slave_tx_buf[i]) + " ");
+			}
+			Serial.println("\n");
+		}
+
 		slave.pop(); // pop the oldest transaction result
 	}
 }
