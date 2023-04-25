@@ -18,8 +18,9 @@ void loop()
 {
 	spislave::poll(); // check if new transaction
 	command = spislave::processTransaction(); // check what type: command or data retrieving (0) - if data retrieving then give data, otherwise retrieve command
-	if(command != 0)
-	{
-		Serial.println("Received command: "+ String(command));
-	}
+
+	// if(command != 0)
+	// {
+	// 	Serial.println("Received command: "+ String(command));
+	// }
 }

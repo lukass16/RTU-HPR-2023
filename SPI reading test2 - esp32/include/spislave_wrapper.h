@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <ESP32SPISlave.h>
 
+#define BUFFER_SIZE 32
+
 #define S_SCK 32
 #define S_CS 33
 #define S_MOSI 12
@@ -13,7 +15,7 @@
 
 ESP32SPISlave slave;
 
-static constexpr uint32_t BUFFER_SIZE{32};
+//static constexpr uint32_t BUFFER_SIZE{32};
 uint8_t spi_slave_tx_buf[BUFFER_SIZE];
 uint8_t spi_slave_rx_buf[BUFFER_SIZE];
 
@@ -49,7 +51,7 @@ namespace spislave
     void printTxBuffer()
     {
         Serial.print("Tx buffer: ");
-        for (int i = 0; i < BUFFER_SIZE; i++)
+        for (int i = 0; i < 8; i++)
         {
             Serial.print(String(spi_slave_tx_buf[i]) + " ");
         }
@@ -59,7 +61,7 @@ namespace spislave
     void printRxBuffer()
     {
         Serial.print("Rx buffer: ");
-        for (int i = 0; i < BUFFER_SIZE; i++)
+        for (int i = 0; i < 8; i++)
         {
             Serial.print(String(spi_slave_rx_buf[i]) + " ");
         }
@@ -73,43 +75,96 @@ namespace spislave
             slave.queue(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
     }
 
+    void wait()
+    {
+        slave.wait(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
+    }
+
     uint8_t processTransaction()
     {
+        static int flag = 0;
+        while (slave.available())
+        {
+            spislave::printRxBuffer();
+            slave.pop();
+
+            if(flag)
+            {
+                for (uint8_t i = 0; i < 8; i++)
+                {
+                    spi_slave_tx_buf[i] = 10 + i;
+                }
+                flag = 0;
+            }
+            else
+            {
+                for (uint8_t i = 0; i < 8; i++)
+                {
+                    spi_slave_tx_buf[i] = 230 + i;
+                }
+                flag = 1;
+            }
+            spislave::printTxBuffer();
+            Serial.println();
+
+        }
+
+        /*
         command = 0; // reset current command
         // if transaction has completed from master, available() returns size of results of transaction and `spi_slave_rx_buf` is automatically updated
         while (slave.available())
         {
+            Serial.println("Transaction received: " + String(slave.available()));
             command = spi_slave_rx_buf[0]; // retrieve sent command
 
-            // check if not dummy command
-            if (command != 0x00)
-            {
-                command_active = 1;
+            command_active = 1;
+            Serial.println("Received command: " + String(command));
 
-                // if command is for data requesting, set the requested data:
-                // (the command essentially says: get ready - I will be requesting such and such data from you)
+            // if command is for data requesting, set the requested data:
+            // (the command essentially says: get ready - I will be requesting such and such data from you)
+            if (command == 0x07)
+            {
                 for (uint8_t i = 0; i < 8; i++)
                 {
-                    spi_slave_tx_buf[i] = 237 + i;
+                    spi_slave_tx_buf[i] = 230 + i;
                 }
-                spislave::printTxBuffer();
-                Serial.println("\n");
             }
-            // reset the transmittable data (the sendable data was already set in the previous transaction)
-            else
+            else if (command == 0x08)
             {
-                command_active = 0; // set that no command is currently active
-            
-                for (uint8_t i = 0; i < 8; i++) // reset tx buffer to zeros
+                for (uint8_t i = 0; i < 8; i++)
+                {
+                    spi_slave_tx_buf[i] = 10 + i;
+                }
+            }
+            else if (command == 0x00)
+            {
+                for (uint8_t i = 0; i < 8; i++)
                 {
                     spi_slave_tx_buf[i] = 0;
                 }
             }
+            spislave::printTxBuffer();
+            Serial.println("\n");
 
-            slave.pop();                // pop the oldest transaction result
+            // // check if not dummy command
+            // if (command != 0x00)
+            // {
+            // }
+            // // reset the transmittable data (the sendable data was already set in the previous transaction)
+            // else if(command_active == 1) // don't reset if no command was active
+            // {
+            //     command_active = 0; // set that no command is currently active
+
+            //     for (uint8_t i = 0; i < 8; i++) // reset tx buffer to zeros
+            //     {
+            //         spi_slave_tx_buf[i] = 1;
+            //     }
+            // }
+
+            slave.pop(); // pop the oldest transaction result
         }
         return command; // return received command
+        */
     }
-    
 
 }

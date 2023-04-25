@@ -6,11 +6,14 @@
 #define S_MOSI 12
 #define S_MISO 13
 
+//* Testing
+int flag = 0;
+
 // https://github.com/hideakitai/ESP32DMASPI
 
 ESP32DMASPI::Slave slave;
 
-static const uint32_t BUFFER_SIZE = 8192;
+static const uint32_t BUFFER_SIZE = 32;
 uint8_t *spi_slave_tx_buf;
 uint8_t *spi_slave_rx_buf;
 
@@ -27,7 +30,7 @@ void setup()
 	slave.setMaxTransferSize(BUFFER_SIZE);
 
 	// begin() after setting
-	slave.begin(HSPI, S_SCK, S_MISO, S_MOSI, S_CS); 
+	slave.begin(HSPI, S_SCK, S_MISO, S_MOSI, S_CS);
 }
 
 void loop()
@@ -41,14 +44,34 @@ void loop()
 	// if transaction has completed from master, available() returns size of results of transaction and buffer is automatically updated
 	while (slave.available())
 	{
-		//Serial.println(slave.available());
-		for(int i = 0; i < 15; i++)
+		// Serial.println(slave.available());
+		for (int i = 0; i < 8; i++)
 		{
 			Serial.print(String(spi_slave_rx_buf[i]) + " ");
 		}
 		Serial.println("Received: " + String(slave.available()));
 
 		slave.pop();
+
+
+		// changing tx buffer content dynamically
+		if(flag)
+		{
+			for (uint8_t i = 0; i < 8; i++)
+			{
+				spi_slave_tx_buf[i] = i;
+			}
+			flag = 0;
+		}
+		else
+		{
+			for (uint8_t i = 0; i < 8; i++)
+			{
+				spi_slave_tx_buf[i] = 40-i;
+			}
+			flag = 1;
+		}
+
 	}
 }
 
