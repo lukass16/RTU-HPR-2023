@@ -172,8 +172,8 @@ namespace motor
     void test1()
     {
         // declare test parameters
-        int spinUpTime = 5000;                // spin up time in ms
-        int spinTotalTime = 100000;            // spin time at max in ms
+        int spinUpTime = 15000;                // spin up time in ms
+        int spinTotalTime = 50000e3;            // spin time at max in ms
         int incrementTime = spinUpTime / 255; // time between increments in ms
         String filename = "test1_03.csv";
 
@@ -188,7 +188,7 @@ namespace motor
         {
             if (millis() - prevTimeTest > incrementTime)
             {
-                if (dutyCycle < 255)
+                if (dutyCycle < 70)
                 {
                     dutyCycle++;
                 }
@@ -202,6 +202,7 @@ namespace motor
             elapsedTimeTest = millis() - startTimeTest;
             getRotationalFrequency(); // calculate rotational RPM
             sdcard::writeDataTest1(fileSD, elapsedTimeTest, dutyCycle, rpm);
+            //imu::readSensor(); //!testing
             
             // slight delay for calculations
             delay(20);
@@ -213,9 +214,10 @@ namespace motor
 
     void test3()
     {
+        dutyCycle = 0;
         // declare test parameters
-        int spinUpTime = 15000;                // spin up time in ms
-        int spinTotalTime = 50000;            // spin time at max in ms
+        int spinUpTime = 20000;                // spin up time in ms
+        int spinTotalTime = 30000;            // !changed for testing: spin time at max in ms 
         int incrementTime = spinUpTime / 255; // time between increments in ms
         String filename = "test3_1.csv";
 
@@ -230,7 +232,7 @@ namespace motor
         {
             if (millis() - prevTimeTest > incrementTime)
             {
-                if (dutyCycle < 255)
+                if (dutyCycle < 20) //!changed for testing: 
                 {
                     dutyCycle++;
                 }

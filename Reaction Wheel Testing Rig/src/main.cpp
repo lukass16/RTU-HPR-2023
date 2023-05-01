@@ -19,7 +19,7 @@ void setup()
 	// asyncserver::setup();	
 	motor::setup();
 	motor::setupEncoder();
-	//imu::setup();
+	imu::setup();
 
 	// controler.Kp = 0.9;
 	// controler.Ki = 5.0;
@@ -32,13 +32,16 @@ void setup()
 	// pidcontrol::setup(&controler);
 
 	// setup SD writing
-	sdcard::setup();
+	//sdcard::setup();
 	// fileSD = sdcard::openFile();
 	// sdcard::writeHeader(fileSD);
 
 	//* Testing
 	motor::testCountdown();
-	motor::test1();
+	while(true)
+	{
+		motor::test3();
+	}
 }
 
 void loop()
