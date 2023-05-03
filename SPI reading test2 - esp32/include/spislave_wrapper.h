@@ -5,10 +5,10 @@
 
 #define BUFFER_SIZE 32
 
-#define S_SCK 32
-#define S_CS 33
-#define S_MOSI 12
-#define S_MISO 13
+#define S_SCK 14
+#define S_CS 15
+#define S_MOSI 13
+#define S_MISO 12
 
 // https://github.com/hideakitai/ESP32SPISlave
 // https://forum.arduino.cc/t/how-to-receive-data-via-spi/251768

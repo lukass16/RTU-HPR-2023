@@ -26,6 +26,7 @@ void setup() {
 }
 
 void loop() {
+    
     // if there is no transaction in queue, add transaction
     if (slave.remained() == 0) {
         slave.queue(spi_slave_rx_buf, spi_slave_tx_buf, BUFFER_SIZE);
@@ -33,12 +34,23 @@ void loop() {
 
 
     while (slave.available()) {
-        // show received data
-        for (size_t i = 0; i < slave.size(); ++i) {
-            printf("%d ", spi_slave_rx_buf[i]);
-        }
-        printf("\n");
+        Serial.println("Read: " + String(slave.available()));
+        // // show received data
+        // for (size_t i = 0; i < slave.size(); ++i) {
+        //     printf("%d ", spi_slave_rx_buf[i]);
+        // }
+        // printf("\n");
+       
+
+        // set_buffer();
+
+        // // for(int i = 0; i < BUFFER_SIZE; i++)
+        // // {
+        // //     Serial.print(spi_slave_tx_buf[i]);
+        
+        // // Serial.println();
 
         slave.pop();
     }
+
 }
