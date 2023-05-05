@@ -15,12 +15,5 @@ void setup()
 
 void loop()
 {
-  len = serialcomms::readPacket();
-  if(len != -1)
-  {
-    serialcomms::displayPacket(serialcomms::received, len, true);
-    serialcomms::decodeFloat(&testFloat, serialcomms::received, 0);
-    Serial.println("Float: " + String(testFloat, 3));
-  }
-  
+  len = serialcomms::readPacket(true);
 }

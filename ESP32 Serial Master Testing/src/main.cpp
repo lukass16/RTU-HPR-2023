@@ -2,6 +2,10 @@
 #include "serial_comms.h"
 
 float testFloat = 2.342;
+byte response = 0x00;
+byte test = 0x00;
+
+byte data[2] = {0x27, 0xAA};
 
 void setup()
 {
@@ -9,15 +13,10 @@ void setup()
 
 	//* Setting up Serial comms
 	serialcomms::setup();
-	serialcomms::prepareDataPacket(testFloat);
 }
 
 void loop()
 {
-	serialcomms::sendPacket(serialcomms::data, 4);
-	serialcomms::displayPacket(serialcomms::data, 4, true);
+	serialcomms::sendPacket(data, 2);
 	delay(1000);
-	
-	testFloat -= 0.300;
-	serialcomms::prepareDataPacket(testFloat);
 }
