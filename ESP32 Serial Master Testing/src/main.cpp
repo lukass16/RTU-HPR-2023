@@ -1,10 +1,6 @@
 #include <Arduino.h>
 #include "serial_comms.h"
 
-float testFloat = 2.342;
-byte response = 0x00;
-byte test = 0x00;
-
 byte data[2] = {0x27, 0xAA};
 
 void setup()
@@ -17,6 +13,16 @@ void setup()
 
 void loop()
 {
-	serialcomms::sendPacket(data, 2);
-	delay(1000);
+	byte response = 0x00;
+	while(response != RESPONSE_BYTE)
+	{
+		serialcomms::sendCommand(0x01);
+		delay(100);
+		int len = serialcomms::readPacket(true);
+		if(len == 1)
+		{
+			response = serialcomms::readCommand();
+		}
+	}
+	delay(2000);
 }

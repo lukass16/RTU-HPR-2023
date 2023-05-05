@@ -9,9 +9,9 @@
 
 namespace serialcomms
 {
-    byte received[BUFFER_SIZE]; // received data
-    byte data[BUFFER_SIZE];     // data to be sent out
-    byte checksum[CHECKSUM_SIZE];   // local checksum variable for checksum calculations
+    byte received[BUFFER_SIZE];   // received data
+    byte data[BUFFER_SIZE];       // data to be sent out
+    byte checksum[CHECKSUM_SIZE]; // local checksum variable for checksum calculations
 
     void setup()
     {
@@ -52,7 +52,7 @@ namespace serialcomms
         sum = 0;
         for (int i = 0; i < len; i++)
         {
-            sum += (data[i] >> 4) ^ 0x55;
+            sum += (data[i]) ^ 0x55;
         }
         checksum[1] = sum;
         return checksum;
@@ -113,6 +113,7 @@ namespace serialcomms
         Serial2.write(len);
         Serial2.write(data, len);
         Serial2.write(calculateChecksum(data, len), CHECKSUM_SIZE);
+        Serial2.flush();
     }
 
     void sendCommand(byte command)
@@ -122,6 +123,7 @@ namespace serialcomms
         Serial2.write(1);
         Serial2.write(command);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
+        Serial2.flush();
     }
 
     void sendSlaveResponse()
@@ -131,6 +133,7 @@ namespace serialcomms
         Serial2.write(1);
         Serial2.write(RESPONSE_BYTE);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
+        Serial2.flush();
     }
 
     int readPacket(bool verbose = false)
