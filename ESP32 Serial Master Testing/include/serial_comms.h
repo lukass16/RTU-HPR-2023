@@ -4,11 +4,14 @@
 
 #define RESPONSE_BYTE 0XAA
 
+#define CHECKSUM_SIZE 2
+#define BUFFER_SIZE 256
+
 namespace serialcomms
 {
-    byte received[256]; // received data
-    byte data[256];     // data to be sent out
-    byte checksum[3];   // local checksum variable for checksum calculations
+    byte received[BUFFER_SIZE]; // received data
+    byte data[BUFFER_SIZE];     // data to be sent out
+    byte checksum[CHECKSUM_SIZE];   // local checksum variable for checksum calculations
 
     void setup()
     {
@@ -49,22 +52,15 @@ namespace serialcomms
         sum = 0;
         for (int i = 0; i < len; i++)
         {
-            sum += (data[i] >> 4);
+            sum += (data[i] >> 4) ^ 0x55;
         }
         checksum[1] = sum;
-        // third checksum
-        sum = 0;
-        for (int i = 0; i < len; i++)
-        {
-            sum += (data[i]) ^ 0x55;
-        }
-        checksum[2] = sum;
         return checksum;
     }
 
     bool compareChecksum(byte *receivedChecksum, byte *calculatedChecksum)
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < CHECKSUM_SIZE; i++)
         {
             if (receivedChecksum[i] != calculatedChecksum[i])
             {
@@ -76,7 +72,7 @@ namespace serialcomms
 
     void printChecksum(byte *checksum)
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < CHECKSUM_SIZE; i++)
         {
             Serial.print(checksum[i], HEX);
             Serial.print(" ");
@@ -116,22 +112,7 @@ namespace serialcomms
     {
         Serial2.write(len);
         Serial2.write(data, len);
-        Serial2.write(calculateChecksum(data, len), 3);
-
-        //* Testing
-        Serial.print("Sent: ");
-        Serial.print(len);
-        for(int i = 0; i < len; i++)
-        {
-            Serial.print(" ");
-            Serial.print(data[i], HEX);
-        }
-        for(int i = 0; i < 3; i++)
-        {
-            Serial.print(" ");
-            Serial.print(calculateChecksum(data, len)[i], HEX);
-        }
-        Serial.println();
+        Serial2.write(calculateChecksum(data, len), CHECKSUM_SIZE);
     }
 
     void sendCommand(byte command)
@@ -140,7 +121,7 @@ namespace serialcomms
 
         Serial2.write(1);
         Serial2.write(command);
-        Serial2.write(calculateChecksum(data, 1), 3);
+        Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
     }
 
     void sendSlaveResponse()
@@ -149,7 +130,7 @@ namespace serialcomms
 
         Serial2.write(1);
         Serial2.write(RESPONSE_BYTE);
-        Serial2.write(calculateChecksum(data, 1), 3);
+        Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
     }
 
     int readPacket(bool verbose = false)
@@ -162,8 +143,8 @@ namespace serialcomms
                 received[i] = Serial2.read();
             }
 
-            byte receivedChecksum[3];
-            for (int i = 0; i < 3; i++)
+            byte receivedChecksum[CHECKSUM_SIZE];
+            for (int i = 0; i < CHECKSUM_SIZE; i++)
             {
                 receivedChecksum[i] = Serial2.read();
             }
