@@ -15,10 +15,9 @@ void setup()
 
 void loop()
 {
-  len = serialcomms::readPacket(true);
-  if(len == 1)
+  byte command = serialcomms::readAndRespondCommand(true);
+  if(command)
   {
-    Serial.println("Received Command: " + String(serialcomms::readCommand(), HEX));
-    serialcomms::sendSlaveResponse();
+    Serial.println("Received Command: " + String(command, HEX));
   }
 }

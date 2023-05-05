@@ -107,7 +107,7 @@ namespace serialcomms
         Serial.println();
     }
 
-    /* Sending-receiving functionality */
+    /* General sending-receiving functionality */
     void sendPacket(byte *data, int len)
     {
         Serial2.write(len);
@@ -116,12 +116,12 @@ namespace serialcomms
         Serial2.flush();
     }
 
-    void sendCommand(byte command)
+    void sendByte(byte b)
     {
-        data[0] = command;
+        data[0] = b;
 
         Serial2.write(1);
-        Serial2.write(command);
+        Serial2.write(b);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
         Serial2.flush();
     }
@@ -189,6 +189,44 @@ namespace serialcomms
     byte readCommand()
     {
         return received[0];
+    }
+
+    /* Specific sending-receiving functionality */
+    bool sendCommand(byte command)
+    {
+        static bool success = 0; // local variable that remembers if command sent successfully
+        serialcomms::sendByte(command);
+        delay(5); // slight delay for receiving response byte
+        int len = serialcomms::readPacket(true);
+        if (len == 1)
+        {
+            byte response = serialcomms::readCommand();
+            if (response == RESPONSE_BYTE)
+            {
+                success = 1;
+            }
+            else
+            {
+                success = 0;
+            }
+        }
+        else
+        {
+            success = 0;
+        }
+        return success;
+    }
+
+    byte readAndRespondCommand(bool verbose = false)
+    {
+        byte command = 0x00;
+        int len = serialcomms::readPacket(verbose);
+        if (len == 1)
+        {
+            command = readCommand();
+            serialcomms::sendSlaveResponse();
+        }
+        return command;
     }
 
 }

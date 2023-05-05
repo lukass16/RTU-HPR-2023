@@ -13,16 +13,10 @@ void setup()
 
 void loop()
 {
-	byte response = 0x00;
-	while(response != RESPONSE_BYTE)
+	while(!serialcomms::sendCommand(0x07))
 	{
-		serialcomms::sendCommand(0x01);
-		delay(100);
-		int len = serialcomms::readPacket(true);
-		if(len == 1)
-		{
-			response = serialcomms::readCommand();
-		}
+		delay(50);
 	}
-	delay(2000);
+	Serial.println("Command sent successfully");
+	delay(500);
 }
