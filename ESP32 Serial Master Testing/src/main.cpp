@@ -13,10 +13,19 @@ void setup()
 
 void loop()
 {
-	while(!serialcomms::sendCommand(0x07))
+	while(!serialcomms::sendCommand(GO_IDLE))
 	{
 		delay(50);
 	}
-	Serial.println("Command sent successfully");
-	delay(500);
+	delay(2000);
+	while(!serialcomms::sendCommand(START_STABILIZATION))
+	{
+		delay(50);
+	}
+	delay(2000);
+	while(!serialcomms::sendCommand(START_POINTING))
+	{
+		delay(50);
+	}
+	delay(2000);
 }

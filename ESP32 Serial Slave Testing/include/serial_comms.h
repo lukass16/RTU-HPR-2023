@@ -2,8 +2,16 @@
 
 #include "Arduino.h"
 
+// defining significant command bytes
+#define GO_IDLE 0x01
+#define START_STABILIZATION 0x02
+#define START_POINTING 0x03
+#define INCREMENT 0x04
+#define DECREMENT 0x05
+#define MOTOR_DATA 0x06
 #define RESPONSE_BYTE 0XAA
 
+// defining buffer sizes
 #define CHECKSUM_SIZE 2
 #define BUFFER_SIZE 256
 
@@ -221,6 +229,7 @@ namespace serialcomms
     {
         byte command = 0x00;
         int len = serialcomms::readPacket(verbose);
+        delayMicroseconds(500); //slight delay between receiving and responding
         if (len == 1)
         {
             command = readCommand();
