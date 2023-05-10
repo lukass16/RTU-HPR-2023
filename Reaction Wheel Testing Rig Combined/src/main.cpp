@@ -35,7 +35,7 @@ void setup()
 	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
 	controler.limMax = 0.95; 
-	controler.limMin = -0.95; 
+	controler.limMin = -0.95;
 
 	pidcontrol::setup(&controler);
 
@@ -94,7 +94,7 @@ void loop()
 	pidcontrol::printTerms(&controler);
 
 
-	motor::stabilize(wheelSpeed);
+	motor::setWheelSpeed(wheelSpeed);
 
 	delay(50);	
 }

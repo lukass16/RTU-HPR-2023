@@ -204,7 +204,7 @@ namespace serialcomms
     {
         static bool success = 0; // local variable that remembers if command sent successfully
         serialcomms::sendByte(command);
-        delay(5); // slight delay for receiving response byte
+        delay(10); // slight delay for receiving response byte
         int len = serialcomms::readPacket(true);
         if (len == 1)
         {
@@ -229,12 +229,37 @@ namespace serialcomms
     {
         byte command = 0x00;
         int len = serialcomms::readPacket(verbose);
-        delayMicroseconds(500); //slight delay between receiving and responding
+        delayMicroseconds(500); // slight delay between receiving and responding
         if (len == 1)
         {
             command = readCommand();
             serialcomms::sendSlaveResponse();
         }
+        return command;
+    }
+
+    //* Development
+    uint8_t getHexCommandFromSerial(bool verbose = false)
+    {
+        static String readString;
+        static char readBuffer[8]; // buffer of size 8
+        int command = 0;
+        while (Serial.available())
+        {
+            readString += Serial.readString(); // read string from serial
+        }
+        if (readString != "")
+        {
+            delay(10);
+            readString.toCharArray(readBuffer, 8);
+            command = strtoul(readBuffer, NULL, 16);
+        }
+        readString = "";
+        if(verbose && command != 0)
+        {
+            Serial.println("Read command:\tDEC: " + String(command) + "\tHEX: " + String(command, HEX));
+        }
+        
         return command;
     }
 
