@@ -3,6 +3,7 @@
 #include "Arduino.h"
 #include "core/core.cpp"
 #include "serial_comms.h"
+#include "buzzer.h"
 
 class IdleState : public State
 {
@@ -12,16 +13,19 @@ public:
     void start() override
     {
         Serial.println("IDLE STATE");
+        buzzer::signalIdleMode();
 
-        while (true)
-        {
-            command = serialcomms::readAndRespondCommand(true);
-            if (command == START_STABILIZATION)
-            {
-                break;
-            }
+         //* Testing
+        delay(2000);
+        // while (true)
+        // {
+        //     command = serialcomms::readAndRespondCommand(true);
+        //     if (command == START_STABILIZATION)
+        //     {
+        //         break;
+        //     }
 
-            delay(10); // some action
-        }
+        //     delay(10); // some action
+        // }
     }
 };
