@@ -5,6 +5,7 @@
 #include "serial_comms.h"
 #include "buzzer.h"
 #include "motor_wrapper.h"
+#include "pid_wrapper.h"
 
 class PreparationState : public State
 {
@@ -24,21 +25,30 @@ public:
 
         // setup IMU
         imu::setup();
-        
-        // setup PID
 
+        // setup PID
+        pidcontrol::setup();
+
+        // calibrate sensor
+        imu::bruteForceCalibration();
 
         //* Testing
-        delay(2000);
-        // while (true)
-        // {
-        //     command = serialcomms::readAndRespondCommand(true);
-        //     if (command == GO_IDLE)
-        //     {
-        //         break;
-        //     }
+        // warn of start
+        buzzer::signalStartWarning();
 
-        //     delay(10); // some action
-        // }
+        //* Testing
+        int interval = 10000; // loop interval in ms
+        unsigned long start_t = millis();
+        while (millis() - start_t < interval)
+        {
+            // read and act upon command
+            command = serialcomms::readAndRespondCommand(true);
+            if (command == GO_IDLE)
+            {
+                break;
+            }
+
+            delay(50); // some action
+        }
     }
 };

@@ -4,6 +4,7 @@
 #include "core/core.cpp"
 #include "serial_comms.h"
 #include "buzzer.h"
+#include "motor_wrapper.h"
 
 class IdleState : public State
 {
@@ -15,17 +16,22 @@ public:
         Serial.println("IDLE STATE");
         buzzer::signalIdleMode();
 
-         //* Testing
-        delay(2000);
-        // while (true)
-        // {
-        //     command = serialcomms::readAndRespondCommand(true);
-        //     if (command == START_STABILIZATION)
-        //     {
-        //         break;
-        //     }
+        //* set wheel speed to 0
+        motor::setWheelSpeed(0);
 
-        //     delay(10); // some action
-        // }
+        //* Testing
+        int interval = 10000; // loop interval in ms
+        unsigned long start_t = millis();
+        while (millis() - start_t < interval)
+        {
+            // read and act upon command
+            command = serialcomms::readAndRespondCommand(true);
+            if (command == START_STABILIZATION)
+            {
+                break;
+            }
+
+            delay(10); // some action
+        }
     }
 };

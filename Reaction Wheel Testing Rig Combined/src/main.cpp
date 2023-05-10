@@ -11,7 +11,6 @@ unsigned long prev_t = millis();
 
 float wheelSpeed = 0;
 
-PIDController controler;
 PIDMode mode = STABILIZE;
 
 SD_File fileSD;
@@ -29,15 +28,8 @@ void setup()
 	motor::setupEncoder();
 	imu::setup();
 
-	controler.Kp = 0.003; 
-	controler.Ki = 0.0005;
-	controler.Kd = -0.002;
-	controler.tau = 0.9;
-	controler.T = 0.05; // sample time in sec
-	controler.limMax = 0.95; 
-	controler.limMin = -0.95;
-
-	pidcontrol::setup(&controler);
+	// setup PID
+	pidcontrol::setup();
 
 	// calibrate sensor
 	imu::bruteForceCalibration();
@@ -48,25 +40,26 @@ void setup()
 
 void loop()
 {
-	// if data received, set new PID gains
-	if(asyncserver::hasData())
-	{
-		controler.Kp = asyncserver::getP();
-		controler.Ki = asyncserver::getI();
-		controler.Kd = asyncserver::getD();
-		asyncserver::printGains();
-	}
+	// // if data received, set new PID gains
+	//* Needs to be updated
+	// if(asyncserver::hasData())
+	// {
+	// 	controler.Kp = asyncserver::getP();
+	// 	controler.Ki = asyncserver::getI();
+	// 	controler.Kd = asyncserver::getD();
+	// 	asyncserver::printGains();
+	// }
 
 	//* Changing modes for test
 	if(mode == STABILIZE)
 	{
 		imu::readSensor();
-		wheelSpeed = pidcontrol::update(&controler, 0);
+		wheelSpeed = pidcontrol::update(0);
 	}
 	else if(mode == POINT)
 	{
 		imu::readSensor();
-		wheelSpeed = pidcontrol::update(&controler, 160);
+		wheelSpeed = pidcontrol::update(160);
 	}
 	if(millis() - prev_t > 10000)
 	{
@@ -74,24 +67,24 @@ void loop()
 		if(mode == STABILIZE)
 		{
 			mode = POINT;
-			pidcontrol::setMode(&controler, mode);
+			pidcontrol::setMode(mode);
 			buzzer::signalPointMode();
 		}
 		else if(mode == POINT)
 		{
 			mode = STABILIZE;
-			pidcontrol::setMode(&controler, mode);
+			pidcontrol::setMode(mode);
 			buzzer::signalStabilizeMode();
 		}
 	}
 
 	
 	//* Testing
-	pidcontrol::printMode(&controler);
+	pidcontrol::printMode();
 	Serial.println("Wheel Speed: " + String(wheelSpeed, 2));
 	Serial.println("Plat Angular Velocity: " + String(imu::getGyrZ(), 2));
 	Serial.println("Plat Orientation: " + String(imu::getPlatOrientation(), 2));
-	pidcontrol::printTerms(&controler);
+	pidcontrol::printTerms();
 
 
 	motor::setWheelSpeed(wheelSpeed);
