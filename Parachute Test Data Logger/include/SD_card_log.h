@@ -133,10 +133,10 @@ namespace SDcard
 
 		if (verbose)
 		{
-			Serial.println(String(getTimeElapsed(), 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + String(or_x, 2) + "," + String(or_y, 2) + "," + String(or_z, 2));
+			Serial.println(String(getTimeElapsed(), 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + "," + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + "," + String(or_x, 2) + "," + String(or_y, 2) + "," + String(or_z, 2));
 		}
 
-		fileSD.println(String(getTimeElapsed(), 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + String(or_x, 2) + "," + String(or_y, 2) + "," + String(or_z, 2));
+		fileSD.println(String(getTimeElapsed(), 2) + "," + String(lat, 4) + "," + String(lng, 4) + "," + String(alt, 2) + "," + String(sats) + "," + String(pressure, 2) + "," + String(altitude, 2) + "," + String(f_altitude, 2) + "," + String(f_velocity, 2) + "," + String(f_acceleration, 2) + "," + String(temperature, 1) + "," + String(acc_x, 2) + "," + String(acc_y, 2) + "," + String(acc_z, 2) + "," + String(gyr_x, 2) + "," + String(gyr_y, 2) + "," + String(gyr_z, 2) + "," + String(or_x, 2) + "," + String(or_y, 2) + "," + String(or_z, 2));
 		return 1;
 	}
 
