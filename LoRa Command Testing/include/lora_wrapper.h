@@ -37,7 +37,7 @@ namespace lora
         SPI.begin(SCK, MISO, MOSI, SS);
 
         // setup LoRa transceiver module
-        LoRa.setPins(SS, RST, DI0);
+        LoRa.setPins(SS, RST, DIO1);
 
         if (!LoRa.begin(frequency))
         {
