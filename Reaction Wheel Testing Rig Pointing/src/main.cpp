@@ -30,7 +30,7 @@ void setup()
 	controler.Kd = -0.002;
 	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
-	controler.limMax = 0.95; //* Notes while testing: 0.3-0.5 seems like an ok range for the limit values
+	controler.limMax = 0.95; //* Notes while tsesting: 0.3-0.5 seems like an ok range for the limit values
 	controler.limMin = -0.95; 
 	/*
 	Note: The tuning gains for pointing are much more sensitive than for stabilising
@@ -39,6 +39,13 @@ void setup()
 	1  |  0.001 | 0.0001 |-0.0006|
 	2  |  0.003 | 0.0005 |-0.002 |
 	*/
+	//* Testing
+	while(true)
+	{
+		motor::test1();
+	}
+	
+
 
 	pidcontrol::setup(&controler);
 
