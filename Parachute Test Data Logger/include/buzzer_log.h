@@ -21,6 +21,7 @@ namespace buzzer
 
     void setup()
     {
+        delay(50);
         pinMode(piezo_pin, OUTPUT);
         Serial.println("Buzzer ready!");
     }

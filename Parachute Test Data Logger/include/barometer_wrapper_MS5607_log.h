@@ -11,7 +11,7 @@ namespace barometer
     double temp = 0;
     double pres = 0;
     double alt = 0;
-    double seaLevelPressure = 102600.00;
+    double seaLevelPressure = 101325.00;
     double sampledSeaLevelPressure = 0;
 
     // Kalman (filtered) readings
