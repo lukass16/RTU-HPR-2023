@@ -38,5 +38,7 @@ void loop()
 		{
 			delay(50);
 		}
+		Serial.println("Command sent");
 	}
+
 }

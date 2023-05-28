@@ -15,6 +15,9 @@
 #define CHECKSUM_SIZE 2
 #define BUFFER_SIZE 256
 
+// defining sender id
+#define SENDER_ID 0x01
+
 namespace serialcomms
 {
     byte received[BUFFER_SIZE];   // received data
@@ -99,9 +102,10 @@ namespace serialcomms
         Serial.println("Length: " + String(len));
     }
 
-    void printPacketDetails(byte *data, int len, byte *receivedCheckSum, bool hex = false)
+    void printPacketDetails(byte *data, int len, int id, byte *receivedCheckSum, bool hex = false)
     {
         Serial.print("\nLength: " + String(len));
+        Serial.print("\nID: " + String(id));
         Serial.print("\tMessage: ");
         for (int i = 0; i < len; i++)
         {
@@ -119,6 +123,7 @@ namespace serialcomms
     void sendPacket(byte *data, int len)
     {
         Serial2.write(len);
+        Serial2.write(SENDER_ID);
         Serial2.write(data, len);
         Serial2.write(calculateChecksum(data, len), CHECKSUM_SIZE);
         Serial2.flush();
@@ -129,6 +134,7 @@ namespace serialcomms
         data[0] = b;
 
         Serial2.write(1);
+        Serial2.write(SENDER_ID);
         Serial2.write(b);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
         Serial2.flush();
@@ -139,6 +145,7 @@ namespace serialcomms
         data[0] = RESPONSE_BYTE;
 
         Serial2.write(1);
+        Serial2.write(SENDER_ID);
         Serial2.write(RESPONSE_BYTE);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
         Serial2.flush();
@@ -149,6 +156,8 @@ namespace serialcomms
         if (Serial2.available())
         {
             uint8_t len = Serial2.read();
+            uint8_t id = Serial2.read();
+
             for (int i = 0; i < len; i++)
             {
                 received[i] = Serial2.read();
@@ -161,11 +170,11 @@ namespace serialcomms
             }
             byte *calculatedChecksum = calculateChecksum(received, len);
 
-            if (compareChecksum(receivedChecksum, calculatedChecksum) && len > 0)
+            if (compareChecksum(receivedChecksum, calculatedChecksum) && len > 0 && id != SENDER_ID)
             {
                 if (verbose)
                 {
-                    printPacketDetails(received, len, receivedChecksum, true);
+                    printPacketDetails(received, len, id, receivedChecksum, true);
                 }
                 return len;
             }
@@ -204,7 +213,7 @@ namespace serialcomms
     {
         static bool success = 0; // local variable that remembers if command sent successfully
         serialcomms::sendByte(command);
-        delay(10); // slight delay for receiving response byte
+        delay(5); // slight delay for receiving response byte
         int len = serialcomms::readPacket(true);
         if (len == 1)
         {
@@ -255,11 +264,11 @@ namespace serialcomms
             command = strtoul(readBuffer, NULL, 16);
         }
         readString = "";
-        if(verbose && command != 0)
+        if (verbose && command != 0)
         {
             Serial.println("Read command:\tDEC: " + String(command) + "\tHEX: " + String(command, HEX));
         }
-        
+
         return command;
     }
 

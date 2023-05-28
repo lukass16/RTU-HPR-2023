@@ -4,8 +4,8 @@
 #include "sdcard_wrapper.h"
 #include "imu_wrapper.h"
 
-#define PWM_PIN 32
-#define DIRECTION_PIN 33
+#define PWM_PIN 33
+#define DIRECTION_PIN 32
 #define A_PIN 37
 #define B_PIN 36 // it was determined that an ISR routine on this pin executes not only when it is rising, but also when pin 37 is falling, be aware of this
 
@@ -171,9 +171,10 @@ namespace motor
     // Motor test sequences
     void test1()
     {
+        dutyCycle = 0;
         // declare test parameters
-        int spinUpTime = 10000;                // spin up time in ms
-        int spinTotalTime = 50000;            // spin time at max in ms
+        int spinUpTime = 40000;                // spin up time in ms
+        int spinTotalTime = 100000;            // spin time at max in ms
         int incrementTime = spinUpTime / 255; // time between increments in ms
         String filename = "test1_4.csv";
 
