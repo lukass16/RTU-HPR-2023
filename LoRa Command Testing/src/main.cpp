@@ -51,7 +51,7 @@ void setup()
 
   // initialize SX1262 with default settings
   Serial.print(F("[SX1262] Initializing ... "));
-  int state = radio.begin(434, 125, 9, 7, 0x12, 10, 8);
+  int state = radio.begin(434, 125, 9, 7, 0x34, 10);
   if (state == RADIOLIB_ERR_NONE)
   {
     Serial.println(F("success!"));
@@ -84,7 +84,7 @@ void loop()
   // NOTE: transmit() is a blocking method!
   //       See example SX126x_Transmit_Interrupt for details
   //       on non-blocking transmission method.
-  int state = radio.transmit("Hello World!");
+  int state = radio.transmit("Lullaby");
 
   // you can also transmit byte array up to 256 bytes long
   /*
