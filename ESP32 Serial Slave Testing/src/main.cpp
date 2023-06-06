@@ -15,9 +15,11 @@ void setup()
 
 void loop()
 {
+  
   byte command = serialcomms::readAndRespondCommand(true);
   if(command)
   {
     Serial.println("Received Command: " + String(command, HEX));
   }
+
 }
