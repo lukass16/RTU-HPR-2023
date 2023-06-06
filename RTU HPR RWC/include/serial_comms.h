@@ -16,7 +16,7 @@
 #define BUFFER_SIZE 256
 
 // defining sender id
-#define SENDER_ID 0x01
+#define SENDER_ID 0x00
 
 namespace serialcomms
 {

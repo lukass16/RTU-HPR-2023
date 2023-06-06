@@ -21,10 +21,10 @@ public:
         // set stabilziation mode
         pidcontrol::setMode(STABILIZE);
 
-        //* Testing
-        int interval = 10000; // loop interval in ms
-        unsigned long start_t = millis();
-        while (millis() - start_t < interval)
+        // //* Testing
+        // int interval = 10000; // loop interval in ms
+        // unsigned long start_t = millis();
+        while (true)
         {
             // read and act upon command
             command = serialcomms::readAndRespondCommand(true);
