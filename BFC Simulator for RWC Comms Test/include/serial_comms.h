@@ -18,6 +18,10 @@
 // defining sender id
 #define SENDER_ID 0x01
 
+//* Custom definitions for working with Heltec (V3)
+#define RX2 6
+#define TX2 7
+
 namespace serialcomms
 {
     byte received[BUFFER_SIZE];   // received data
@@ -26,7 +30,7 @@ namespace serialcomms
 
     void setup()
     {
-        Serial2.begin(115200); // hardware serial 2 (RX-16, TX-17)
+        Serial2.begin(115200, SERIAL_8N1, RX2, TX2); // hardware serial 2 mapped to different pins (i.e. 6 and 7)
         Serial.println("Starting serial comms");
     }
 
@@ -274,6 +278,18 @@ namespace serialcomms
         }
 
         return command;
+    }
+
+    int testRead()
+    {
+        if (Serial2.available())
+        {
+            uint8_t testByte = Serial2.read();
+            Serial.println("Received: " + String(testByte, HEX));
+
+            return testByte;
+        }
+        return -1;
     }
 
 }

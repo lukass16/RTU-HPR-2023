@@ -13,7 +13,7 @@ void setup()
 
 void loop()
 {
-	//lora::send("Gerard", 1);
+	// //lora::send("Gerard", 1);
 	uint8_t command = lora::receiveCommand();
 	if (command != 0)
 	{
@@ -23,4 +23,5 @@ void loop()
 		}
 		Serial.println("Command sent");
 	}
+
 }
