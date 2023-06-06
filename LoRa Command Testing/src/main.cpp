@@ -10,8 +10,5 @@ void setup()
 void loop()
 {
 	//lora::send("Gerard", 1);
-	lora::receive();
-
-	// wait for a second before transmitting again
-	delay(1000);
+	lora::receiveCommand();
 }
