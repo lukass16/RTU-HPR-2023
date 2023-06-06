@@ -217,7 +217,7 @@ namespace serialcomms
     {
         static bool success = 0; // local variable that remembers if command sent successfully
         serialcomms::sendByte(command);
-        delay(5); // slight delay for receiving response byte
+        delay(10); // slight delay for receiving response byte
         int len = serialcomms::readPacket(true);
         if (len == 1)
         {
