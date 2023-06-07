@@ -25,9 +25,9 @@ void setup()
 	motor::setupEncoder();
 	imu::setup();
 
-	controler.Kp = 0.003; //* Notes while testing: 0.003-0.01 seems like an ok sensitivity range for solely P term
-	controler.Ki = 0.0005;
-	controler.Kd = -0.002;
+	controler.Kp = 0.005; //* Notes while testing: 0.003-0.01 seems like an ok sensitivity range for solely P term
+	controler.Ki = 0.001;
+	controler.Kd = -0.005;
 	controler.tau = 0.9;
 	controler.T = 0.05; // sample time in sec
 	controler.limMax = 0.95; //* Notes while tsesting: 0.3-0.5 seems like an ok range for the limit values
@@ -38,15 +38,10 @@ void setup()
 	Nr |	P 	|  	I 	 |	 D 	 |
 	1  |  0.001 | 0.0001 |-0.0006|
 	2  |  0.003 | 0.0005 |-0.002 |
+	3  |  0.007 | 0.002  |-0.006 | - new wheel
+	4  |  0.005 | 0.001  |-0.005 |
+
 	*/
-	//* Testing
-	while(true)
-	{
-		motor::test1();
-	}
-	
-
-
 	pidcontrol::setup(&controler);
 
 	// calibrate sensor

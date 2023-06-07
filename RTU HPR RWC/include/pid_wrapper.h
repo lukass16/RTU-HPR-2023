@@ -38,9 +38,9 @@ namespace pidcontrol
 	{
 		controler.mode = STABILIZE,
 		
-		controler.Kp = 0.003,
-		controler.Ki = 0.0005,
-		controler.Kd = -0.002,
+		controler.Kp = 0.005,
+		controler.Ki = 0.001,
+		controler.Kd = -0.005,
 		controler.tau = 0.9,
 		controler.T = 0.05, // sample time in sec
 		controler.limMax = 0.95,
@@ -165,9 +165,9 @@ namespace pidcontrol
 		}
 		else if (mode == POINT)
 		{
-			pid->Kp = 0.003;
-			pid->Ki = 0.0005;
-			pid->Kd = -0.002;
+			pid->Kp = 0.005;
+			pid->Ki = 0.001;
+			pid->Kd = -0.005;
 
 			// keep only the integral term
 			pid->proportional = 0;
