@@ -180,6 +180,12 @@ namespace serialcomms
             }
             else
             {
+                //*Testing
+                if(len != 0)
+                {
+                    printPacketDetails(received, len, id, receivedChecksum, true);
+                }
+                
                 return -1;
             }
         }

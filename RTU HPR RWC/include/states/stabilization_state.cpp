@@ -38,11 +38,11 @@ public:
             wheelSpeed = pidcontrol::update(0);
 
             //* Testing
-            pidcontrol::printMode();
-            Serial.println("Wheel Speed: " + String(wheelSpeed, 2));
-            Serial.println("Plat Angular Velocity: " + String(imu::getGyrZ(), 2));
-            Serial.println("Plat Orientation: " + String(imu::getPlatOrientation(), 2));
-            pidcontrol::printTerms();
+            // pidcontrol::printMode();
+            // Serial.println("Wheel Speed: " + String(wheelSpeed, 2));
+            // Serial.println("Plat Angular Velocity: " + String(imu::getGyrZ(), 2));
+            // Serial.println("Plat Orientation: " + String(imu::getPlatOrientation(), 2));
+            // pidcontrol::printTerms();
 
             motor::setWheelSpeed(wheelSpeed);
 

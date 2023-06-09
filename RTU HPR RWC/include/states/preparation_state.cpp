@@ -24,13 +24,13 @@ public:
         motor::setupEncoder();
 
         // setup IMU
-        //imu::setup(); //! commented out for testing
+        imu::setup(); //! commented out for testing
 
         // setup PID
         pidcontrol::setup();
 
         // calibrate sensor
-        //imu::bruteForceCalibration(); //! commented out for testing
+        imu::bruteForceCalibration(); //! commented out for testing
 
         //* Testing
         // warn of start

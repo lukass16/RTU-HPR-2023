@@ -22,4 +22,6 @@ void loop()
     Serial.println("Received Command: " + String(command, HEX));
   }
 
+  delay(50);
+
 }

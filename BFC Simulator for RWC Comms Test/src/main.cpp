@@ -20,7 +20,7 @@ void loop()
 	{
 		while (!serialcomms::sendCommand(command, 1))
 		{
-			delay(50);
+			delay(250);
 		}
 		Serial.println("Command sent");
 	}
