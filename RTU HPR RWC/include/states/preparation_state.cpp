@@ -30,7 +30,7 @@ public:
         pidcontrol::setup();
 
         // calibrate sensor
-        imu::bruteForceCalibration(); //! commented out for testing
+        // imu::bruteForceCalibration(); //! commented out for testing
 
         //* Testing
         // warn of start
