@@ -16,7 +16,8 @@
 #define BUFFER_SIZE 256
 
 // defining sender id
-#define SENDER_ID 0x01
+#define LOCAL_ID 0x27
+#define SENDER_ID 0x54
 
 //* Custom definitions for working with Heltec (V3)
 #define RX2 6
@@ -126,8 +127,8 @@ namespace serialcomms
     /* General sending-receiving functionality */
     void sendPacket(byte *data, int len)
     {
+        Serial2.write(LOCAL_ID);
         Serial2.write(len);
-        Serial2.write(SENDER_ID);
         Serial2.write(data, len);
         Serial2.write(calculateChecksum(data, len), CHECKSUM_SIZE);
         Serial2.flush();
@@ -137,8 +138,8 @@ namespace serialcomms
     {
         data[0] = b;
 
+        Serial2.write(LOCAL_ID);
         Serial2.write(1);
-        Serial2.write(SENDER_ID);
         Serial2.write(b);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
         Serial2.flush();
@@ -148,8 +149,8 @@ namespace serialcomms
     {
         data[0] = RESPONSE_BYTE;
 
+        Serial2.write(LOCAL_ID);
         Serial2.write(1);
-        Serial2.write(SENDER_ID);
         Serial2.write(RESPONSE_BYTE);
         Serial2.write(calculateChecksum(data, 1), CHECKSUM_SIZE);
         Serial2.flush();
@@ -157,11 +158,15 @@ namespace serialcomms
 
     int readPacket(bool verbose = false)
     {
-        if (Serial2.available())
+        while (Serial2.available())
         {
-            uint8_t len = Serial2.read();
             uint8_t id = Serial2.read();
+            if(id != SENDER_ID) // if this is not the start of a message from the expected sender - skip
+            {
+                continue;
+            }
 
+            uint8_t len = Serial2.read();
             for (int i = 0; i < len; i++)
             {
                 received[i] = Serial2.read();
@@ -174,7 +179,7 @@ namespace serialcomms
             }
             byte *calculatedChecksum = calculateChecksum(received, len);
 
-            if (compareChecksum(receivedChecksum, calculatedChecksum) && len > 0 && id != SENDER_ID)
+            if (compareChecksum(receivedChecksum, calculatedChecksum) && len > 0 && id != LOCAL_ID)
             {
                 if (verbose)
                 {
@@ -212,6 +217,11 @@ namespace serialcomms
         return received[0];
     }
 
+    void clearCommand()
+    {
+        received[0] = 0x00;
+    }
+
     /* Specific sending-receiving functionality */
     bool sendCommand(byte command, bool verbose = false)
     {
@@ -222,6 +232,7 @@ namespace serialcomms
         if (len == 1)
         {
             byte response = serialcomms::readCommand();
+            clearCommand(); // clean buffer for next command
             if (response == RESPONSE_BYTE)
             {
                 success = 1;
