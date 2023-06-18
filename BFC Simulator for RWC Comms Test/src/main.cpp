@@ -14,13 +14,13 @@ void setup()
 void loop()
 {
 	// //lora::send("Gerard", 1);
-	uint8_t command = serialcomms::getHexCommandFromSerial(1);
-	//uint8_t command = lora::receiveCommand();
+	// uint8_t command = serialcomms::getHexCommandFromSerial(1);
+	uint8_t command = lora::receiveCommand();
 	if (command != 0)
 	{
 		while (!serialcomms::sendCommand(command, 1))
 		{
-			delay(100);
+			delay(50);
 		}
 		Serial.println("Command sent");
 	}

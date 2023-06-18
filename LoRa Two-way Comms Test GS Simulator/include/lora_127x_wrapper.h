@@ -333,7 +333,7 @@ namespace lora
 
                 // send another one
                 Serial.print(F("Sending another packet: "));
-                transmissionState = radio.startTransmit("Packet");
+                transmissionState = radio.startTransmit("GS");
                 transmitting = true;
             }
         }
