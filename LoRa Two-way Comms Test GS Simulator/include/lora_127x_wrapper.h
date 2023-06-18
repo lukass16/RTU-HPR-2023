@@ -1,24 +1,6 @@
 #include <Arduino.h>
 #include <RadioLib.h>
 
-//* Testing: start
-#define FIRST_NODE 0
-// save transmission states between loops
-int transmissionState = RADIOLIB_ERR_NONE;
-
-// flag to indicate transmission or reception state
-bool transmitting = false;
-
-// flag to indicate that a packet was sent or received
-volatile bool operationDone = false;
-
-void setFlag(void)
-{
-    // we sent or received  packet, set the flag
-    operationDone = true;
-}
-//* Testing: end
-
 #define LORA_SS 18
 #define LORA_RST 14
 #define LORA_DIO0 26
@@ -26,6 +8,20 @@ void setFlag(void)
 #define LORA_SCK 5
 #define LORA_MISO 19
 #define LORA_MOSI 27
+
+
+// save transmission states between loops
+int transmissionState = RADIOLIB_ERR_NONE;
+// flag to indicate transmission or reception state
+bool transmitting = false;
+// flag to indicate that a packet was sent or received
+volatile bool operationDone = false;
+
+void setFlag(void)
+{
+    // we sent or received packet, set the flag
+    operationDone = true;
+}
 
 SX1276 radio = new Module(LORA_SS, LORA_DIO0, LORA_RST, LORA_DIO1);
 
@@ -51,34 +47,8 @@ namespace lora
                 ;
         }
 
-        //* Testing
         // set the function that will be called when new packet is received
         radio.setDio0Action(setFlag, RISING);
-
-        if (FIRST_NODE)
-        {
-            // send the first packet on this node
-            Serial.println(F("Sending first packet."));
-            transmissionState = radio.startTransmit("First");
-            transmitting = true;
-        }
-        else
-        {
-            // start listening for LoRa packets on this node
-            Serial.println(F("Starting to listen."));
-            state = radio.startReceive();
-            if (state == RADIOLIB_ERR_NONE)
-            {
-                Serial.println(F("Success."));
-            }
-            else
-            {
-                Serial.print(F("failed, code "));
-                Serial.println(state);
-                while (true)
-                    ;
-            }
-        }
     }
 
     void send(String outgoing, bool verbose = false)
@@ -291,8 +261,38 @@ namespace lora
         return 0x00;
     }
 
-    void pingPong()
+    void pingPong(bool firstNode = false)
     {
+        static bool firstCall = true;
+        if (firstCall) // executed only on first call of function
+        {
+            if (firstNode)
+            {
+                // send the first packet on this node
+                Serial.println(F("Sending first packet."));
+                transmissionState = radio.startTransmit("First");
+                transmitting = true;
+            }
+            else
+            {
+                // start listening for LoRa packets on this node
+                Serial.print(F("Starting to listen."));
+                int state = radio.startReceive();
+                if (state == RADIOLIB_ERR_NONE)
+                {
+                    Serial.println(F("success!"));
+                }
+                else
+                {
+                    Serial.print(F("failed, code "));
+                    Serial.println(state);
+                    while (true)
+                        ;
+                }
+            }
+            firstCall = false;
+        }
+        
         //* check if the previous operation finished (either sending or receiving)
         if (operationDone)
         {
@@ -314,7 +314,7 @@ namespace lora
 
                 // listen for response
                 radio.startReceive();
-                transmitting = false; 
+                transmitting = false;
             }
             else //* if finished receiving, read data and send packet
             {
