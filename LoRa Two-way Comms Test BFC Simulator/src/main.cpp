@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include "lora_126x_wrapper.h"
 
+
+
+
 void setup()
 {
 	Serial.begin(115200);
@@ -9,6 +12,7 @@ void setup()
 
 void loop()
 {
-	//lora::send("Gerard", 1);
-	lora::receiveCommand();
+	// //lora::send("Gerard", 1);
+	// lora::sendCommand(0x27, 1);
+	lora::pingPong();
 }

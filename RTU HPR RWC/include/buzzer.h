@@ -3,6 +3,7 @@
 #include "Arduino.h"
 
 #define RESONATING_FREQ 2500
+#define BP 50
 #define BOP 100
 #define BEEP 1000
 
@@ -98,6 +99,28 @@ namespace buzzer
             delay(BOP);
             digitalWrite(piezo_pin, LOW);
             delay(BOP);
+        }
+    }
+
+    void signalIncrement()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            digitalWrite(piezo_pin, HIGH); // 1)
+            delay(BP);
+            digitalWrite(piezo_pin, LOW);
+            delay(BP);
+        }
+    }
+
+    void signalDecrement()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            digitalWrite(piezo_pin, HIGH); // 1)
+            delay(BP);
+            digitalWrite(piezo_pin, LOW);
+            delay(BP);
         }
     }
 }

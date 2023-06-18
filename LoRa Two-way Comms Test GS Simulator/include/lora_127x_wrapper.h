@@ -1,6 +1,24 @@
 #include <Arduino.h>
 #include <RadioLib.h>
 
+//* Testing: start
+#define FIRST_NODE 0
+// save transmission states between loops
+int transmissionState = RADIOLIB_ERR_NONE;
+
+// flag to indicate transmission or reception state
+bool transmitting = false;
+
+// flag to indicate that a packet was sent or received
+volatile bool operationDone = false;
+
+void setFlag(void)
+{
+    // we sent or received  packet, set the flag
+    operationDone = true;
+}
+//* Testing: end
+
 #define LORA_SS 18
 #define LORA_RST 14
 #define LORA_DIO0 26
@@ -31,6 +49,35 @@ namespace lora
             Serial.println(state);
             while (true)
                 ;
+        }
+
+        //* Testing
+        // set the function that will be called when new packet is received
+        radio.setDio0Action(setFlag, RISING);
+
+        if (FIRST_NODE)
+        {
+            // send the first packet on this node
+            Serial.println(F("Sending first packet."));
+            transmissionState = radio.startTransmit("First");
+            transmitting = true;
+        }
+        else
+        {
+            // start listening for LoRa packets on this node
+            Serial.println(F("Starting to listen."));
+            state = radio.startReceive();
+            if (state == RADIOLIB_ERR_NONE)
+            {
+                Serial.println(F("Success."));
+            }
+            else
+            {
+                Serial.print(F("failed, code "));
+                Serial.println(state);
+                while (true)
+                    ;
+            }
         }
     }
 
@@ -242,5 +289,53 @@ namespace lora
             }
         }
         return 0x00;
+    }
+
+    void pingPong()
+    {
+        //* check if the previous operation finished (either sending or receiving)
+        if (operationDone)
+        {
+            // reset flag
+            operationDone = false;
+
+            if (transmitting) //* if finished sending then start to listen
+            {
+                if (transmissionState == RADIOLIB_ERR_NONE)
+                {
+                    // packet was successfully sent
+                    Serial.println(F("transmission finished"));
+                }
+                else
+                {
+                    Serial.print(F("failed, code "));
+                    Serial.println(transmissionState);
+                }
+
+                // listen for response
+                radio.startReceive();
+                transmitting = false; 
+            }
+            else //* if finished receiving, read data and send packet
+            {
+                String str;
+                int state = radio.readData(str);
+
+                if (state == RADIOLIB_ERR_NONE)
+                {
+                    // packet was successfully received
+                    Serial.print(F("Received packet: "));
+                    Serial.println(str);
+                }
+
+                // wait a second before transmitting again
+                delay(1000);
+
+                // send another one
+                Serial.print(F("Sending another packet: "));
+                transmissionState = radio.startTransmit("Packet");
+                transmitting = true;
+            }
+        }
     }
 };

@@ -10,5 +10,5 @@ void setup()
 
 void loop()
 {
-	lora::send("Gerard", 1);
+	lora::pingPong();
 }

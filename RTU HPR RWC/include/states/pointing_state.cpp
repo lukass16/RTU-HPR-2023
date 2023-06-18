@@ -12,6 +12,7 @@ class PointingState : public State
 public:
     byte command = 0x00;
     float wheelSpeed = 0;
+    float pointSetpoint = 160;
 
     void start() override
     {
@@ -35,15 +36,21 @@ public:
             else if (command == INCREMENT)
             {
                 // increment PID setpoint
+                pointSetpoint += 30;
+                Serial.println("Incremented pointing setpoint. Current setpoint: " + String(pointSetpoint, 2));
+                buzzer::signalIncrement();
             }
             else if (command == DECREMENT)
             {
                 // decrement PID setpoint
+                pointSetpoint -= 30;
+                Serial.println("Decremented pointing setpoint. Current setpoint: " + String(pointSetpoint, 2));
+                buzzer::signalDecrement();
             }
 
             // PID control
             imu::readSensor();
-            wheelSpeed = pidcontrol::update(160);
+            wheelSpeed = pidcontrol::update(pointSetpoint);
 
             //* Testing
             // pidcontrol::printMode();

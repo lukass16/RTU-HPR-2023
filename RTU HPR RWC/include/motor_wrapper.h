@@ -146,7 +146,7 @@ namespace motor
             }
         }
 
-        Serial.println(String(dutyCycle) + "\t" + String(direction));
+        // Serial.println(String(dutyCycle) + "\t" + String(direction));
 
         // sending stabilizing commands to motor
         motor::setDutyCycle(dutyCycle);
