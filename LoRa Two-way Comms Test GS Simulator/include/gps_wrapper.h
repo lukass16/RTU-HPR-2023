@@ -1,10 +1,6 @@
 #pragma once
 #include <TinyGPS++.h>
 
-//* Custom definitions for working with Heltec (V3)
-#define RX2 6
-#define TX2 7
-
 namespace gps
 {
     TinyGPSPlus gps;
@@ -12,7 +8,7 @@ namespace gps
 
     void setup(uint gpsRate = 9600)
     {
-        Serial2.begin(gpsRate, SERIAL_8N1, RX2, TX2); // hardware serial 2 (RX-16, TX-17)
+        Serial2.begin(gpsRate); // hardware serial 2 (RX-16, TX-17)
         Serial.println("Init GPS: " + String(gpsRate));
     }
 
