@@ -9,6 +9,7 @@
 #define LORA_MISO 19
 #define LORA_MOSI 27
 
+#define GPS_TIME_TRIGGER 2
 
 // save transmission states between loops
 int transmissionState = RADIOLIB_ERR_NONE;
@@ -261,6 +262,84 @@ namespace lora
         return 0x00;
     }
 
+    void executeOperation(int syncTime)
+    {
+        if (syncTime != prevSyncTime) // if new sync time
+        {
+            triggerExecuted = false; // reset trigger
+            prevSyncTime = syncTime;
+
+            //*Testing
+            Serial.println("Sync time: " + String(syncTime));
+        }
+
+        // Need to transmit
+        if (syncTime == GPS_TIME_TRIGGER)
+        {
+            if (triggerExecuted) // if already executed trigger during this syncTime, return
+            {
+                return;
+            }
+
+            if (!transmitting) // if not yet transmitting
+            {
+                transmissionState = radio.startTransmit("BFC");
+                transmitting = true;
+            }
+            else
+            {
+                if (operationDone) // if triggered interrupt for sending - finished operation
+                {
+                    operationDone = false;
+
+                    if (transmissionState == RADIOLIB_ERR_NONE) // check if transmission was successful
+                    {
+                        // packet was successfully sent
+                        Serial.println(F("Transmission finished."));
+                        triggerExecuted = true;
+
+                        // Start listening for response
+                        radio.startReceive();
+                        transmitting = false;
+                    }
+                    else
+                    {
+                        Serial.print("Transmission failed, status code: " + String(transmissionState));
+                        transmitting = false; // reset transmitting flag, to "not currently transmitting", so that we can try again next loop
+                    }
+                }
+            }
+        }
+
+        // Need to listen
+        else
+        {
+            if (operationDone) // if triggered interrupt for receiving - finished operation - i.e. received something
+            {
+                operationDone = false;
+
+                String str;
+                int state = radio.readData(str);
+
+                // check success of operation
+                if (state == RADIOLIB_ERR_NONE)
+                {
+                    // packet was successfully received
+                    Serial.print(F("Received packet: "));
+                    Serial.println(str);
+                }
+                else
+                {
+                    Serial.print("Receiving failed, status code: " + String(state));
+                }
+
+                // Start listening for response again
+                radio.startReceive();
+                transmitting = false;
+            }
+        }
+    }
+
     void pingPong(bool firstNode = false)
     {
         static bool firstCall = true;
@@ -292,7 +371,7 @@ namespace lora
             }
             firstCall = false;
         }
-        
+
         //* check if the previous operation finished (either sending or receiving)
         if (operationDone)
         {

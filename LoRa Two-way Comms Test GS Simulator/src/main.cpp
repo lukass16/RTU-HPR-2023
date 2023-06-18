@@ -2,7 +2,6 @@
 #include "lora_127x_wrapper.h"
 #include "gps_wrapper.h"
 
-#define GPS_TIME_TRIGGER 2
 
 int syncTime = 0;
 
@@ -18,13 +17,7 @@ void loop()
 {
 	//lora::pingPong();
 	gps::readGps();
-	if(gps::getSyncTime() != syncTime)
-	{
-		syncTime = gps::getSyncTime();
-		Serial.println("Sync time: " + String(syncTime));
-		if(syncTime == GPS_TIME_TRIGGER)
-		{
-			Serial.println("SEND triggered.");
-		}
-	}
+	syncTime = gps::getSyncTime();
+	lora::executeOperation(syncTime); // execute operation based on what time it is
+
 }

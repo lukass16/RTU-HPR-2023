@@ -37,6 +37,11 @@ namespace gps
         return _syncTime;
     }
 
+    bool checkSyncTimeTrigger(int syncTime)
+    {
+        return syncTime == GPS_TIME_TRIGGER;
+    }
+
     void printData()
     {
         if (hasData)
