@@ -9,6 +9,7 @@ namespace gps
 {
     TinyGPSPlus gps;
     boolean hasData = false;
+    int _syncTime = 0;
 
     void setup(uint gpsRate = 9600)
     {
@@ -29,7 +30,11 @@ namespace gps
 
     int getSyncTime()
     {
-        return gps.time.second() % 4;
+        if (hasData && gps.time.isValid()) // if got new valid time data
+        {
+            _syncTime = gps.time.second() % 4;
+        }
+        return _syncTime;
     }
 
     void printData()
