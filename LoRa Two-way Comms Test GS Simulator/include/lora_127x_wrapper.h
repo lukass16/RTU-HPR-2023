@@ -9,12 +9,12 @@
 #define LORA_MISO 19
 #define LORA_MOSI 27
 
-#define GPS_TIME_TRIGGER 2
+#define GPS_TIME_TRIGGER 2 // sync time on which we trigger sending
 
 // save transmission states between loops
-int transmissionState = RADIOLIB_ERR_NONE;
+int transmissionState = RADIOLIB_ERR_NONE, prevSyncTime = 0;
 // flag to indicate transmission or reception state
-bool transmitting = false;
+bool transmitting = false, triggerExecuted = false;
 // flag to indicate that a packet was sent or received
 volatile bool operationDone = false;
 
@@ -283,7 +283,7 @@ namespace lora
 
             if (!transmitting) // if not yet transmitting
             {
-                transmissionState = radio.startTransmit("BFC");
+                transmissionState = radio.startTransmit("GS");
                 transmitting = true;
             }
             else
