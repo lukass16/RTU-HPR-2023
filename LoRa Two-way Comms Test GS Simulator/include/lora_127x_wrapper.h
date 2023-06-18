@@ -262,6 +262,30 @@ namespace lora
         return 0x00;
     }
 
+
+    /*
+    Note: the following function is quite involved, here is a short summary of its operation:
+
+    It works essentially in 2 modes:
+    1. Listening - if trigger has not been set
+    2. Sending - if trigger has been set
+
+    If the trigger has been set - i.e. - if the current sync time allows us to send, then:
+    We first check if we are not currently transmitting (i.e. if previously we haven't already triggered sending). If we are not sending, then we start sending.
+    If we are, however, currently sending/transmitting then we check if the operation has been finished (via the triggering of an interrupt). If it is not then we skip,
+    but if it is finished then we check if the transmission was successful. If it was we disallow any further sending during this particular sync time via the triggerExecuted flag.
+    But if the transmission failed, we reset the transmitting flag so that we can try sending again during this same sync time.
+    We should also note that if the transmission was successful, we immediately start listening for a response (i.e. we start waiting for the receiving interrupt to be triggered
+    , which it will be if we receive something).
+
+    If the trigger has not been set - i.e. - if the current sync time is meant for listening, then:
+    We essentially just wait while we receive something. We know if we have received something, when the action interrupt is triggered, i.e. when operationDone is set to true.
+    If we indeed received something, we check if we received it successfully, and if we did - we do something with the data. If we didn't, then we print out the
+    problem and really do nothing. Then we start listening again for a response. 
+    We should also note that when the sync time changes to the GPS_TRIGGER_TIME and we are once allowed to send data, we ignore whether or not the receiving operation
+    was finished. (It is not yet clear as to how okay, this is)
+    */
+
     void executeOperation(int syncTime)
     {
         if (syncTime != prevSyncTime) // if new sync time

@@ -20,5 +20,4 @@ void loop()
 	syncTime = gps::getSyncTime();
 	lora::executeOperation(syncTime); // execute operation based on what time it is
 
-	
 }
